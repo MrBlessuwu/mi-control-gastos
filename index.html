@@ -1,1 +1,118 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mi Control de Dinero</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .card { border-radius: 15px; padding: 15px; margin-bottom: 10px; color: white; }
+        .bg-semanal { background: #28a745; }
+        .bg-ahorro { background: #007bff; }
+        .bg-emergencia { background: #ffc107; color: black; }
+        .bg-gastos { background: #dc3545; }
+    </style>
+</head>
+<body class="bg-gray-100 font-sans">
 
+    <div class="max-w-md mx-auto p-4">
+        <h1 class="text-2xl font-bold text-center mb-4">💰 Mis Finanzas</h1>
+
+        <div class="grid grid-cols-2 gap-2">
+            <div class="card bg-semanal text-center">
+                <p class="text-xs">Semanal</p>
+                <h2 id="saldo-semanal" class="text-xl font-bold">Q0.00</h2>
+            </div>
+            <div class="card bg-ahorro text-center">
+                <p class="text-xs">Ahorro Intocable</p>
+                <h2 id="saldo-ahorro" class="text-xl font-bold">Q0.00</h2>
+            </div>
+            <div class="card bg-emergencia text-center">
+                <p class="text-xs">Emergencia</p>
+                <h2 id="saldo-emergencia" class="text-xl font-bold">Q0.00</h2>
+            </div>
+            <div class="card bg-gastos text-center">
+                <p class="text-xs">Gastos Hoy</p>
+                <h2 id="gastos-hoy" class="text-xl font-bold">Q0.00</h2>
+            </div>
+        </div>
+
+        <button onclick="registrarPasaje()" class="w-full bg-blue-600 text-white font-bold py-4 rounded-xl shadow-lg mb-4 text-lg">
+            🚌 Pagar Pasaje (Q5.00)
+        </button>
+
+        <div class="bg-white p-4 rounded-xl shadow-md">
+            <h3 class="font-bold mb-2">Registrar Movimiento</h3>
+            <input type="number" id="monto" placeholder="Monto Q" class="w-full border p-2 rounded mb-2">
+            <select id="tipo" class="w-full border p-2 rounded mb-2">
+                <option value="semanal">Gasto Semanal (Chicles, agua...)</option>
+                <option value="emergencia">Emergencia (Usar fondo)</option>
+                <option value="ingreso">Ingreso (Cargar Semanal)</option>
+            </select>
+            <input type="text" id="nota" placeholder="¿En qué lo gastaste?" class="w-full border p-2 rounded mb-4">
+            <button onclick="guardarMovimiento()" class="w-full bg-black text-white py-2 rounded-lg">Guardar Movimiento</button>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getFirestore, doc, onSnapshot, updateDoc, increment, setDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+        // CONFIGURACIÓN QUE ME PASASTE
+        const firebaseConfig = {
+            apiKey: "AIzaSyBrpGejWy2Xstf_KiqkNSlfknl3HaBhyyE",
+            authDomain: "finanzas-3e70d.firebaseapp.com",
+            projectId: "finanzas-3e70d",
+            storageBucket: "finanzas-3e70d.firebasestorage.app",
+            messagingSenderId: "125350113957",
+            appId: "1:125350113957:web:16e676cc72327bb158934c"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const docRef = doc(db, "usuario", "mi_cartera");
+
+        // ESCUCHAR DATOS EN TIEMPO REAL
+        onSnapshot(docRef, (docSnap) => {
+            if (docSnap.exists()) {
+                const d = docSnap.data();
+                document.getElementById('saldo-semanal').innerText = `Q${d.semanal.toFixed(2)}`;
+                document.getElementById('saldo-ahorro').innerText = `Q${d.ahorro.toFixed(2)}`;
+                document.getElementById('saldo-emergencia').innerText = `Q${d.emergencia.toFixed(2)}`;
+                document.getElementById('gastos-hoy').innerText = `Q${d.gastosHoy.toFixed(2)}`;
+            } else {
+                // Inicializar si no existe
+                setDoc(docRef, { semanal: 0, ahorro: 100, emergencia: 50, gastosHoy: 0 });
+            }
+        });
+
+        // FUNCIONES GLOBALES
+        window.registrarPasaje = async () => {
+            await updateDoc(docRef, {
+                semanal: increment(-5),
+                gastosHoy: increment(5)
+            });
+            alert("Pasaje descontado 🚌");
+        };
+
+        window.guardarMovimiento = async () => {
+            const monto = parseFloat(document.getElementById('monto').value);
+            const tipo = document.getElementById('tipo').value;
+            
+            if (isNaN(monto)) return alert("Pon un número válido");
+
+            if(tipo === "semanal") {
+                await updateDoc(docRef, { semanal: increment(-monto), gastosHoy: increment(monto) });
+            } else if(tipo === "emergencia") {
+                await updateDoc(docRef, { emergencia: increment(-monto) });
+            } else if(tipo === "ingreso") {
+                await updateDoc(docRef, { semanal: increment(monto) });
+            }
+            
+            document.getElementById('monto').value = "";
+            document.getElementById('nota').value = "";
+            alert("¡Listo!");
+        };
+    </script>
+</body>
+</html>
