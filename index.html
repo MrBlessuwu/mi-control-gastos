@@ -3,11 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>Control DuoFinanzas</title>
+    <title>DuoFinanzas & Negocio</title>
     <link rel="icon" href="https://i.pinimg.com/736x/0d/0d/e8/0d0de8e48c4d5a4e72f336cd1857cfd7.jpg" type="image/jpeg">
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        /* Estilos personalizados para parecer App Nativa */
         body { -webkit-tap-highlight-color: transparent; }
         .card { border-radius: 20px; padding: 18px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); color: white; transition: transform 0.1s; }
         .card:active { transform: scale(0.97); }
@@ -16,12 +15,14 @@
         .bg-emergencia { background: linear-gradient(135deg, #ffc107, #e0a800); color: #333; }
         .bg-gastos { background: linear-gradient(135deg, #dc3545, #a71d2a); }
         
-        /* Modal estilo iOS */
-        #modal-editor { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 100; justify-content: center; align-items: center; backdrop-filter: blur(5px); }
-        .modal-content { background: white; padding: 25px; border-radius: 25px; width: 90%; max-w-sm; }
+        #modal-editor { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 100; justify-content: center; align-items: center; backdrop-filter: blur(5px); }
+        .modal-content { background: white; padding: 25px; border-radius: 25px; width: 95%; max-w-md; max-height: 90vh; overflow-y: auto; }
         
-        .user-section { border-bottom: 2px solid #eee; padding-bottom: 15px; margin-bottom: 15px; }
-        .active-user-btn { border: 2px solid black !important; font-weight: bold; }
+        .active-user-btn { background: #111; color: white !important; font-weight: bold; border-radius: 999px; }
+        .history-item { border-left: 4px solid #007bff; background: #f8f9fa; padding: 10px; margin-bottom: 8px; border-radius: 8px; }
+        .history-item.gasto { border-left-color: #dc3545; }
+        .history-item.ingreso { border-left-color: #28a745; }
+        .history-item.prestamo { border-left-color: #ffc107; }
     </style>
 </head>
 <body class="bg-gray-100 font-sans pb-10">
@@ -29,102 +30,137 @@
     <div class="bg-white p-4 shadow-md sticky top-0 z-50 flex justify-between items-center">
         <div class="flex items-center gap-2">
             <img src="https://i.pinimg.com/736x/0d/0d/e8/0d0de8e48c4d5a4e72f336cd1857cfd7.jpg" alt="Logo" class="w-8 h-8 rounded-full border">
-            <h1 class="text-xl font-bold text-gray-800">DuoFinanzas Q</h1>
+            <h1 class="text-xl font-bold text-gray-800">Control Total</h1>
         </div>
-        <button onclick="abrirEditor()" class="text-xs bg-gray-200 px-3 py-1 rounded-full text-gray-600 active:bg-gray-300">🛠️ Modo Editor</button>
+        <button onclick="abrirEditor()" class="text-xs bg-gray-200 px-3 py-1 rounded-full text-gray-800 font-bold active:bg-gray-300">🛠️ Parche Manual</button>
     </div>
 
     <div class="max-w-md mx-auto p-4 space-y-6">
 
-        <div class="grid grid-cols-2 gap-3 bg-white p-2 rounded-full shadow-inner border">
-            <button id="btn-roger" onclick="cambiarUsuario('roger')" class="py-2 rounded-full text-center active-user-btn border border-transparent">👨‍💻 Roger</button>
-            <button id="btn-marian" onclick="cambiarUsuario('marian')" class="py-2 rounded-full text-center border border-transparent">👩‍💼 Marian</button>
+        <div class="grid grid-cols-3 gap-1 bg-white p-1 rounded-full shadow-inner border">
+            <button id="btn-roger" onclick="cambiarUsuario('roger')" class="py-2 text-sm text-gray-600 active-user-btn transition-colors">👨‍💻 Roger</button>
+            <button id="btn-marian" onclick="cambiarUsuario('marian')" class="py-2 text-sm text-gray-600 transition-colors">👩‍💼 Marian</button>
+            <button id="btn-negocio" onclick="cambiarUsuario('negocio')" class="py-2 text-sm text-gray-600 transition-colors">🏪 Negocio</button>
         </div>
 
-        <h2 id="view-title" class="text-center text-lg font-bold text-gray-700">- Cuentas de Roger -</h2>
+        <h2 id="view-title" class="text-center text-xl font-bold text-gray-700 uppercase tracking-wide">Cuentas de Roger</h2>
         
         <div class="grid grid-cols-2 gap-3">
             <div class="card bg-semanal">
-                <p class="text-xs opacity-80">Dinero Semanal</p>
-                <h2 id="saldo-semanal" class="text-2xl font-bold mt-1">Q0.00</h2>
+                <p class="text-xs opacity-90 font-bold">Semanal / Caja</p>
+                <h2 id="saldo-semanal" class="text-3xl font-bold mt-1">Q0.00</h2>
             </div>
             <div class="card bg-ahorro">
-                <p class="text-xs opacity-80">Ahorro Fondo</p>
-                <h2 id="saldo-ahorro" class="text-2xl font-bold mt-1">Q0.00</h2>
+                <p class="text-xs opacity-90 font-bold">Ahorro</p>
+                <h2 id="saldo-ahorro" class="text-3xl font-bold mt-1">Q0.00</h2>
             </div>
             <div class="card bg-emergencia">
-                <p class="text-xs opacity-80">Uso Emergencia</p>
-                <h2 id="saldo-emergencia" class="text-2xl font-bold mt-1">Q0.00</h2>
+                <p class="text-xs opacity-90 font-bold">Emergencia</p>
+                <h2 id="saldo-emergencia" class="text-3xl font-bold mt-1">Q0.00</h2>
             </div>
             <div class="card bg-gastos">
-                <p class="text-xs opacity-80">Gastos de Hoy</p>
-                <h2 id="gastos-hoy" class="text-2xl font-bold mt-1">Q0.00</h2>
+                <p class="text-xs opacity-90 font-bold">Gastos Hoy</p>
+                <h2 id="gastos-hoy" class="text-3xl font-bold mt-1">Q0.00</h2>
             </div>
         </div>
 
-        <div class="bg-white p-5 rounded-3xl shadow-lg border">
-            <h3 class="font-bold text-gray-800 mb-3 flex items-center gap-2">🚌 Calculadora de Pasajes (Variable)</h3>
+        <div id="seccion-pasajes" class="bg-white p-5 rounded-3xl shadow-lg border">
+            <h3 class="font-bold text-gray-800 mb-3 text-lg flex items-center gap-2">🚌 Pasajes</h3>
             <div class="grid grid-cols-2 gap-2 mb-3">
-                <input type="number" id="pasaje-bus" placeholder="Bus Q (ej. 5)" class="border p-3 rounded-xl">
-                <input type="number" id="pasaje-transmetro" placeholder="Transmetro Q (ej. 1)" class="border p-3 rounded-xl">
+                <input type="number" id="pasaje-bus" placeholder="Bus (Q)" class="border p-3 rounded-xl bg-gray-50">
+                <input type="number" id="pasaje-transmetro" placeholder="Transmetro (Q)" class="border p-3 rounded-xl bg-gray-50">
             </div>
             <div class="grid grid-cols-2 gap-2">
-                <button onclick="calcularPasaje(false)" class="bg-blue-600 text-white py-3 rounded-xl font-bold active:bg-blue-700">Ida o Vuelta</button>
-                <button onclick="calcularPasaje(true)" class="bg-blue-800 text-white py-3 rounded-xl font-bold active:bg-blue-900">Ida y Vuelta</button>
+                <button onclick="calcularPasaje(false)" class="bg-blue-600 text-white py-3 rounded-xl font-bold active:bg-blue-700 shadow-md">Solo Ida/Vuelta</button>
+                <button onclick="calcularPasaje(true)" class="bg-blue-800 text-white py-3 rounded-xl font-bold active:bg-blue-900 shadow-md">Ambos</button>
             </div>
-            <button id="btn-acompaniar" onclick="acompaniarMarian()" class="w-full mt-2 bg-purple-100 text-purple-800 py-2 rounded-lg text-sm hidden">➕ Acompañar a Marian (+Q1 R +Q1 M)</button>
+            <button id="btn-acompaniar" onclick="acompaniarMarian()" class="w-full mt-3 bg-purple-100 text-purple-800 py-3 rounded-xl font-bold text-sm shadow-sm hidden">➕ Acompañar a Marian (-Q1 R / -Q1 M)</button>
         </div>
 
         <div class="bg-white p-5 rounded-3xl shadow-lg border">
-            <h3 class="font-bold text-gray-800 mb-3">📝 Registrar Otro Movimiento</h3>
-            <input type="number" id="monto-general" placeholder="Monto Q" class="w-full border p-3 rounded-xl mb-2 text-lg">
-            <select id="tipo-general" class="w-full border p-3 rounded-xl mb-2 bg-gray-50">
-                <option value="semanal_gasto">Gasto Semanal (Chicle, agua...)</option>
-                <option value="emergencia_gasto">Gasto de Emergencia</option>
-                <option value="ingreso_semanal">Ingreso / Cargar Semanal (Mamá/Trabajo)</option>
-                <option value="ingreso_ahorro">Ingreso a Ahorro</option>
+            <h3 class="font-bold text-gray-800 mb-3 text-lg">💸 Registrar Gasto / Ingreso</h3>
+            <input type="number" id="monto-general" placeholder="Monto Q" class="w-full border p-3 rounded-xl mb-2 text-lg bg-gray-50">
+            <select id="tipo-general" class="w-full border p-3 rounded-xl mb-2 bg-gray-50 font-semibold text-gray-700">
+                <option value="gasto_semanal">➖ Gasto Semanal (Restar de Semanal)</option>
+                <option value="gasto_emergencia">➖ Gasto Emergencia (Restar de Emergencia)</option>
+                <option value="ingreso_semanal">➕ Ingreso Semanal (Sumar a Semanal)</option>
+                <option value="ingreso_ahorro">➕ Ingreso Ahorro (Sumar a Ahorro)</option>
             </select>
-            <input type="text" id="nota-general" placeholder="Nota (ej. Agua pura)" class="w-full border p-3 rounded-xl mb-3">
-            <button onclick="guardarMovimientoGeneral()" class="w-full bg-gray-900 text-white py-3 rounded-xl font-bold active:bg-black text-lg">Guardar Movimiento</button>
+            <input type="text" id="nota-general" placeholder="Detalle (Ej: Agua, Sueldo...)" class="w-full border p-3 rounded-xl mb-3 bg-gray-50">
+            <button onclick="guardarMovimientoGeneral()" class="w-full bg-gray-900 text-white py-3 rounded-xl font-bold active:bg-black shadow-md text-lg">Guardar</button>
+        </div>
+
+        <div class="bg-white p-5 rounded-3xl shadow-lg border border-yellow-300">
+            <h3 class="font-bold text-gray-800 mb-3 text-lg">🤝 Préstamos (Entrada de Dinero)</h3>
+            <div class="grid grid-cols-2 gap-2 mb-2">
+                <input type="text" id="prestamo-quien" placeholder="¿Quién prestó?" class="border p-3 rounded-xl bg-gray-50">
+                <input type="number" id="prestamo-monto" placeholder="Monto Q" class="border p-3 rounded-xl bg-gray-50">
+            </div>
+            <select id="prestamo-cuenta" class="w-full border p-3 rounded-xl mb-3 bg-gray-50 text-gray-700">
+                <option value="semanal">Entra a la cuenta: Semanal</option>
+                <option value="ahorro">Entra a la cuenta: Ahorro</option>
+                <option value="emergencia">Entra a la cuenta: Emergencia</option>
+            </select>
+            <button onclick="registrarPrestamo()" class="w-full bg-yellow-500 text-black py-3 rounded-xl font-bold active:bg-yellow-600 shadow-md">Registrar Préstamo</button>
+
+            <div class="mt-4 border-t pt-3">
+                <h4 class="font-bold text-sm text-gray-600 mb-2">Deudas Pendientes de <span id="nombre-deudor" class="capitalize"></span></h4>
+                <div id="lista-prestamos" class="space-y-2 text-sm">
+                    </div>
+            </div>
+        </div>
+
+        <div class="bg-white p-5 rounded-3xl shadow-lg border">
+            <h3 class="font-bold text-gray-800 mb-3 text-lg">📜 Historial de <span id="nombre-historial" class="capitalize"></span></h3>
+            <div id="lista-historial" class="space-y-1 max-h-64 overflow-y-auto text-sm">
+                </div>
         </div>
 
     </div>
 
     <div id="modal-editor">
-        <div class="modal-content shadow-2xl space-y-4">
-            <h2 class="text-xl font-bold text-center text-red-600">🛠️ MODO EDITOR</h2>
-            <p class="text-xs text-center text-gray-500">Usa esto solo para corregir saldos manualmente por robos, préstamos o errores.</p>
+        <div class="modal-content shadow-2xl">
+            <h2 class="text-xl font-bold text-center text-red-600 mb-1">🛠️ EDITOR MANUAL</h2>
+            <p class="text-xs text-center text-gray-500 mb-4">Corrige saldos por errores o dinero perdido.</p>
             
-            <div class="user-section">
-                <p class="font-bold text-sm">👨‍💻 Saldos de ROGER</p>
-                <div class="grid grid-cols-3 gap-1 mt-1">
-                    <input type="number" id="edit-r-sem" placeholder="Sem" class="border p-2 rounded text-sm">
-                    <input type="number" id="edit-r-aho" placeholder="Aho" class="border p-2 rounded text-sm">
-                    <input type="number" id="edit-r-eme" placeholder="Eme" class="border p-2 rounded text-sm">
+            <div id="editor-forms" class="space-y-4">
+                <div class="border-b pb-2">
+                    <p class="font-bold text-sm">👨‍💻 ROGER</p>
+                    <div class="grid grid-cols-3 gap-1 mt-1">
+                        <input type="number" id="edit-roger-sem" placeholder="Semanal" class="border p-2 rounded text-xs">
+                        <input type="number" id="edit-roger-aho" placeholder="Ahorro" class="border p-2 rounded text-xs">
+                        <input type="number" id="edit-roger-eme" placeholder="Emer" class="border p-2 rounded text-xs">
+                    </div>
+                </div>
+                <div class="border-b pb-2">
+                    <p class="font-bold text-sm">👩‍💼 MARIAN</p>
+                    <div class="grid grid-cols-3 gap-1 mt-1">
+                        <input type="number" id="edit-marian-sem" placeholder="Semanal" class="border p-2 rounded text-xs">
+                        <input type="number" id="edit-marian-aho" placeholder="Ahorro" class="border p-2 rounded text-xs">
+                        <input type="number" id="edit-marian-eme" placeholder="Emer" class="border p-2 rounded text-xs">
+                    </div>
+                </div>
+                <div class="border-b pb-2">
+                    <p class="font-bold text-sm">🏪 NEGOCIO</p>
+                    <div class="grid grid-cols-3 gap-1 mt-1">
+                        <input type="number" id="edit-negocio-sem" placeholder="Caja" class="border p-2 rounded text-xs">
+                        <input type="number" id="edit-negocio-aho" placeholder="Ahorro" class="border p-2 rounded text-xs">
+                        <input type="number" id="edit-negocio-eme" placeholder="Fondo" class="border p-2 rounded text-xs">
+                    </div>
                 </div>
             </div>
 
-            <div class="user-section">
-                <p class="font-bold text-sm">👩‍💼 Saldos de MARIAN</p>
-                <div class="grid grid-cols-3 gap-1 mt-1">
-                    <input type="number" id="edit-m-sem" placeholder="Sem" class="border p-2 rounded text-sm">
-                    <input type="number" id="edit-m-aho" placeholder="Aho" class="border p-2 rounded text-sm">
-                    <input type="number" id="edit-m-eme" placeholder="Eme" class="border p-2 rounded text-sm">
-                </div>
-            </div>
-
-            <div class="grid grid-cols-2 gap-2 pt-2">
-                <button onclick="cerrarEditor()" class="bg-gray-200 py-2 rounded-xl text-gray-700">Cancelar</button>
-                <button onclick="aplicarCambiosManuales()" class="bg-red-600 py-2 rounded-xl text-white font-bold">Aplicar Parche</button>
+            <div class="grid grid-cols-2 gap-2 pt-4">
+                <button onclick="cerrarEditor()" class="bg-gray-200 py-3 rounded-xl text-gray-800 font-bold">Cancelar</button>
+                <button onclick="aplicarParche()" class="bg-red-600 py-3 rounded-xl text-white font-bold shadow-md">Guardar Parche</button>
             </div>
         </div>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getFirestore, doc, onSnapshot, updateDoc, increment, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { getFirestore, doc, onSnapshot, updateDoc, increment, setDoc, collection, addDoc, query, orderBy, limit } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-        // TU CONFIGURACIÓN DE FIREBASE (La que me pasaste)
         const firebaseConfig = {
             apiKey: "AIzaSyBrpGejWy2Xstf_KiqkNSlfknl3HaBhyyE",
             authDomain: "finanzas-3e70d.firebaseapp.com",
@@ -137,170 +173,245 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
         
-        // Referencias a los documentos de los dos usuarios
-        const rogerRef = doc(db, "usuario", "roger");
-        const marianRef = doc(db, "usuario", "marian");
+        let usuarioActivo = 'roger';
+        let datosLocales = { roger: null, marian: null, negocio: null };
 
-        let usuarioActivo = 'roger'; // Roger por defecto
-        let datosLocales = { roger: null, marian: null };
-
-        // --- INICIALIZACIÓN Y ESCUCHA EN TIEMPO REAL ---
-        function inicializarEscucha(ref, usuario) {
-            onSnapshot(ref, (docSnap) => {
+        // --- INICIALIZACIÓN ---
+        const usuarios = ['roger', 'marian', 'negocio'];
+        usuarios.forEach(user => {
+            onSnapshot(doc(db, "usuario", user), (docSnap) => {
                 if (docSnap.exists()) {
-                    datosLocales[usuario] = docSnap.data();
-                    if (usuario === usuarioActivo) renderDashboard();
+                    datosLocales[user] = docSnap.data();
+                    if (user === usuarioActivo) renderDashboard();
                 } else {
-                    // Crear estructura inicial si no existe el usuario
-                    setDoc(ref, { semanal: 0, ahorro: 0, emergencia: 0, gastosHoy: 0, lastReset: new Date().toDateString() });
+                    setDoc(doc(db, "usuario", user), { semanal: 0, ahorro: 0, emergencia: 0, gastosHoy: 0, lastReset: new Date().toDateString() });
                 }
             });
-        }
+        });
 
-        inicializarEscucha(rogerRef, 'roger');
-        inicializarEscucha(marianRef, 'marian');
-
-        // --- RENDERIZADO DEL DASHBOARD ---
+        // --- RENDER DASHBOARD ---
         function renderDashboard() {
             const d = datosLocales[usuarioActivo];
             if (!d) return;
 
-            // Resetear Gastos de Hoy si cambió el día
-            const hoyString = new Date().toDateString();
-            if(d.lastReset !== hoyString) {
-                updateDoc(usuarioActivo === 'roger' ? rogerRef : marianRef, { gastosHoy: 0, lastReset: hoyString });
+            // Reset diario de gastos
+            const hoyStr = new Date().toDateString();
+            if(d.lastReset !== hoyStr) {
+                updateDoc(doc(db, "usuario", usuarioActivo), { gastosHoy: 0, lastReset: hoyStr });
             }
 
-            // Título
-            document.getElementById('view-title').innerText = `- Cuentas de ${usuarioActivo.charAt(0).toUpperCase() + usuarioActivo.slice(1)} -`;
+            document.getElementById('view-title').innerText = `Cuentas de ${usuarioActivo}`;
+            document.getElementById('nombre-deudor').innerText = usuarioActivo;
+            document.getElementById('nombre-historial').innerText = usuarioActivo;
             
-            // Saldos
             document.getElementById('saldo-semanal').innerText = `Q${d.semanal.toFixed(2)}`;
             document.getElementById('saldo-ahorro').innerText = `Q${d.ahorro.toFixed(2)}`;
             document.getElementById('saldo-emergencia').innerText = `Q${d.emergencia.toFixed(2)}`;
             document.getElementById('gastos-hoy').innerText = `Q${d.gastosHoy.toFixed(2)}`;
 
-            // Mostrar/Ocultar botón especial de Roger
-            const btnAcompaniar = document.getElementById('btn-acompaniar');
-            if(usuarioActivo === 'roger') btnAcompaniar.classList.remove('hidden');
-            else btnAcompaniar.classList.add('hidden');
+            // UI Conditional logic
+            document.getElementById('seccion-pasajes').style.display = (usuarioActivo === 'negocio') ? 'none' : 'block';
+            document.getElementById('btn-acompaniar').style.display = (usuarioActivo === 'roger') ? 'block' : 'none';
         }
 
-        // --- NAVEGACIÓN ---
-        window.cambiarUsuario = (usuario) => {
-            usuarioActivo = usuario;
-            document.getElementById('btn-roger').classList.remove('active-user-btn');
-            document.getElementById('btn-marian').classList.remove('active-user-btn');
-            document.getElementById(`btn-${usuario}`).classList.add('active-user-btn');
+        window.cambiarUsuario = (user) => {
+            usuarioActivo = user;
+            document.querySelectorAll('.active-user-btn').forEach(b => {
+                b.classList.remove('active-user-btn');
+                b.classList.add('text-gray-600');
+            });
+            const btn = document.getElementById(`btn-${user}`);
+            btn.classList.add('active-user-btn');
+            btn.classList.remove('text-gray-600');
             renderDashboard();
+            renderHistorialLocally();
+            renderPrestamosLocally();
         }
 
-        // --- LÓGICA DE PASAJES (FLEXIBLE) ---
-        window.calcularPasaje = async (esIdaYVuelta) => {
-            const bus = parseFloat(document.getElementById('pasaje-bus').value) || 0;
-            const trans = parseFloat(document.getElementById('pasaje-transmetro').value) || 0;
-            const multiplicador = esIdaYVuelta ? 2 : 1;
+        // --- FUNCIÓN MAESTRA DEL HISTORIAL ---
+        async function registrarEnHistorial(usuario, tipo, monto, cuenta, detalle) {
+            await addDoc(collection(db, "movimientos"), {
+                usuario: usuario,
+                tipo: tipo, // "gasto", "ingreso", "prestamo"
+                monto: monto,
+                cuenta: cuenta,
+                detalle: detalle,
+                fechaIso: new Date().toISOString(), // Para ordenar internamente
+                fechaLegible: new Date().toLocaleString('es-GT')
+            });
+        }
 
-            const totalGasto = (bus + trans) * multiplicador;
+        // --- LOGICA DE PASAJES ---
+        window.calcularPasaje = async (doble) => {
+            const b = parseFloat(document.getElementById('pasaje-bus').value) || 0;
+            const t = parseFloat(document.getElementById('pasaje-transmetro').value) || 0;
+            const total = (b + t) * (doble ? 2 : 1);
 
-            if (totalGasto <= 0) return alert("Pon un monto en Bus o Transmetro");
+            if (total <= 0) return alert("Ingresa un monto válido");
 
-            const ref = usuarioActivo === 'roger' ? rogerRef : marianRef;
+            await updateDoc(doc(db, "usuario", usuarioActivo), { semanal: increment(-total), gastosHoy: increment(total) });
+            await registrarEnHistorial(usuarioActivo, "gasto", total, "Semanal", `Pasaje (${doble ? 'Ida y Vuelta' : 'Un viaje'})`);
             
-            try {
-                await updateDoc(ref, {
-                    semanal: increment(-totalGasto),
-                    gastosHoy: increment(totalGasto)
-                });
-                alert(`Gasto de Q${totalGasto.toFixed(2)} registrado`);
-                // Limpiar campos
-                document.getElementById('pasaje-bus').value = '';
-                document.getElementById('pasaje-transmetro').value = '';
-            } catch (e) { alert("Error: " + e); }
+            document.getElementById('pasaje-bus').value = ''; document.getElementById('pasaje-transmetro').value = '';
+            alert(`Pasaje registrado: -Q${total}`);
         }
 
-        // Función especial: Roger acompaña a Marian
         window.acompaniarMarian = async () => {
-            // Regla: Rasta Q1 a Roger y Q1 a Marian (Transmetro de los dos)
-            try {
-                await updateDoc(rogerRef, { semanal: increment(-1), gastosHoy: increment(1) });
-                await updateDoc(marianRef, { semanal: increment(-1), gastosHoy: increment(1) });
-                alert("Acompañamiento registrado (-Q1 a cada uno)");
-            } catch (e) { alert("Error: " + e); }
+            await updateDoc(doc(db, "usuario", "roger"), { semanal: increment(-1), gastosHoy: increment(1) });
+            await registrarEnHistorial("roger", "gasto", 1, "Semanal", "Transmetro (Acompañó a Marian)");
+            
+            await updateDoc(doc(db, "usuario", "marian"), { semanal: increment(-1), gastosHoy: increment(1) });
+            await registrarEnHistorial("marian", "gasto", 1, "Semanal", "Transmetro (Acompañada por Roger)");
+            
+            alert("Acompañamiento registrado: -Q1 Roger y -Q1 Marian");
         }
 
         // --- MOVIMIENTOS GENERALES ---
         window.guardarMovimientoGeneral = async () => {
             const monto = parseFloat(document.getElementById('monto-general').value);
             const tipo = document.getElementById('tipo-general').value;
-            const ref = usuarioActivo === 'roger' ? rogerRef : marianRef;
-
-            if (isNaN(monto) || monto <= 0) return alert("Monto no válido");
+            const nota = document.getElementById('nota-general').value || 'Sin detalle';
+            
+            if (isNaN(monto) || monto <= 0) return alert("Monto inválido");
 
             let updates = {};
+            let cuentaNom = "";
+            let tipoAccion = "gasto";
 
-            switch (tipo) {
-                case 'semanal_gasto':
-                    updates = { semanal: increment(-monto), gastosHoy: increment(monto) };
-                    break;
-                case 'emergencia_gasto':
-                    updates = { emergencia: increment(-monto) };
-                    break;
-                case 'ingreso_semanal':
-                    updates = { semanal: increment(monto) };
-                    break;
-                case 'ingreso_ahorro':
-                    updates = { ahorro: increment(monto) };
-                    break;
-            }
+            if(tipo === "gasto_semanal") { updates = { semanal: increment(-monto), gastosHoy: increment(monto) }; cuentaNom = "Semanal"; }
+            else if(tipo === "gasto_emergencia") { updates = { emergencia: increment(-monto) }; cuentaNom = "Emergencia"; }
+            else if(tipo === "ingreso_semanal") { updates = { semanal: increment(monto) }; cuentaNom = "Semanal"; tipoAccion = "ingreso"; }
+            else if(tipo === "ingreso_ahorro") { updates = { ahorro: increment(monto) }; cuentaNom = "Ahorro"; tipoAccion = "ingreso"; }
 
-            try {
-                await updateDoc(ref, updates);
-                alert("Movimiento guardado");
-                document.getElementById('monto-general').value = '';
-                document.getElementById('nota-general').value = '';
-            } catch (e) { alert("Error: " + e); }
+            await updateDoc(doc(db, "usuario", usuarioActivo), updates);
+            await registrarEnHistorial(usuarioActivo, tipoAccion, monto, cuentaNom, nota);
+            
+            document.getElementById('monto-general').value = ''; document.getElementById('nota-general').value = '';
+            alert("✅ Guardado correctamente");
         }
 
-        // --- MODO EDITOR (MANUAL) ---
+        // --- SISTEMA DE PRÉSTAMOS ---
+        window.registrarPrestamo = async () => {
+            const prestamista = document.getElementById('prestamo-quien').value;
+            const monto = parseFloat(document.getElementById('prestamo-monto').value);
+            const cuentaDestino = document.getElementById('prestamo-cuenta').value; // semanal, ahorro, emergencia
+
+            if(!prestamista || isNaN(monto) || monto <= 0) return alert("Llena bien los datos del préstamo");
+
+            // 1. Crear registro de deuda
+            await addDoc(collection(db, "prestamos"), {
+                deudor: usuarioActivo, prestamista: prestamista, monto: monto,
+                cuenta: cuentaDestino, pagado: false, fecha: new Date().toLocaleString('es-GT')
+            });
+
+            // 2. Sumar el dinero
+            await updateDoc(doc(db, "usuario", usuarioActivo), { [cuentaDestino]: increment(monto) });
+            
+            // 3. Historial
+            await registrarEnHistorial(usuarioActivo, "prestamo", monto, cuentaDestino.toUpperCase(), `Préstamo RECIBIDO de: ${prestamista}`);
+
+            document.getElementById('prestamo-quien').value = ''; document.getElementById('prestamo-monto').value = '';
+            alert("Préstamo registrado y dinero sumado 💰");
+        }
+
+        window.pagarPrestamo = async (idPrestamo, prestamista, monto, cuenta) => {
+            if(!confirm(`¿Pagar Q${monto} a ${prestamista}? Se restará de tu cuenta: ${cuenta.toUpperCase()}`)) return;
+
+            // 1. Marcar como pagado
+            await updateDoc(doc(db, "prestamos", idPrestamo), { pagado: true });
+
+            // 2. Restar dinero
+            await updateDoc(doc(db, "usuario", usuarioActivo), { [cuenta]: increment(-monto) });
+
+            // 3. Historial
+            await registrarEnHistorial(usuarioActivo, "gasto", monto, cuenta.toUpperCase(), `PAGO de Préstamo a: ${prestamista}`);
+
+            alert("✅ Préstamo Pagado");
+        }
+
+        // --- ESCUCHAS EN TIEMPO REAL (Historial y Préstamos) ---
+        let todosMovimientos = [];
+        const queryMov = query(collection(db, "movimientos"), orderBy("fechaIso", "desc"), limit(50));
+        onSnapshot(queryMov, (snap) => {
+            todosMovimientos = snap.docs.map(d => ({id: d.id, ...d.data()}));
+            renderHistorialLocally();
+        });
+
+        let todosPrestamos = [];
+        onSnapshot(collection(db, "prestamos"), (snap) => {
+            todosPrestamos = snap.docs.map(d => ({id: d.id, ...d.data()}));
+            renderPrestamosLocally();
+        });
+
+        function renderHistorialLocally() {
+            const list = document.getElementById('lista-historial');
+            list.innerHTML = '';
+            const mUser = todosMovimientos.filter(m => m.usuario === usuarioActivo);
+            
+            if(mUser.length === 0) return list.innerHTML = '<p class="text-gray-400">No hay movimientos aún.</p>';
+
+            mUser.forEach(m => {
+                let colorClass = m.tipo === 'gasto' ? 'gasto' : (m.tipo === 'ingreso' ? 'ingreso' : 'prestamo');
+                let signo = m.tipo === 'gasto' ? '-' : '+';
+                list.innerHTML += `
+                    <div class="history-item ${colorClass}">
+                        <div class="flex justify-between font-bold text-gray-800">
+                            <span>${m.detalle}</span>
+                            <span>${signo}Q${m.monto.toFixed(2)}</span>
+                        </div>
+                        <div class="flex justify-between text-xs text-gray-500 mt-1">
+                            <span>Cuenta: ${m.cuenta}</span>
+                            <span>${m.fechaLegible}</span>
+                        </div>
+                    </div>`;
+            });
+        }
+
+        function renderPrestamosLocally() {
+            const list = document.getElementById('lista-prestamos');
+            list.innerHTML = '';
+            const pendientes = todosPrestamos.filter(p => p.deudor === usuarioActivo && !p.pagado);
+
+            if(pendientes.length === 0) return list.innerHTML = '<p class="text-green-600 font-bold">¡Cero deudas pendientes! 🎉</p>';
+
+            pendientes.forEach(p => {
+                list.innerHTML += `
+                    <div class="flex justify-between items-center bg-yellow-50 p-3 rounded-xl border border-yellow-200">
+                        <div>
+                            <p class="font-bold text-gray-800">${p.prestamista} <span class="text-red-600">-Q${p.monto}</span></p>
+                            <p class="text-xs text-gray-500">A cuenta: ${p.cuenta} | ${p.fecha}</p>
+                        </div>
+                        <button onclick="pagarPrestamo('${p.id}', '${p.prestamista}', ${p.monto}, '${p.cuenta}')" class="bg-black text-white px-3 py-1 rounded-lg text-xs font-bold shadow">PAGAR</button>
+                    </div>`;
+            });
+        }
+
+        // --- EDITOR MANUAL (PARCHE) ---
         window.abrirEditor = () => {
             document.getElementById('modal-editor').style.display = 'flex';
-            // Cargar datos actuales en los inputs
-            document.getElementById('edit-r-sem').value = datosLocales.roger.semanal;
-            document.getElementById('edit-r-aho').value = datosLocales.roger.ahorro;
-            document.getElementById('edit-r-eme').value = datosLocales.roger.emergencia;
-            document.getElementById('edit-m-sem').value = datosLocales.marian.semanal;
-            document.getElementById('edit-m-aho').value = datosLocales.marian.ahorro;
-            document.getElementById('edit-m-eme').value = datosLocales.marian.emergencia;
+            usuarios.forEach(u => {
+                if(datosLocales[u]) {
+                    document.getElementById(`edit-${u}-sem`).value = datosLocales[u].semanal;
+                    document.getElementById(`edit-${u}-aho`).value = datosLocales[u].ahorro;
+                    document.getElementById(`edit-${u}-eme`).value = datosLocales[u].emergencia;
+                }
+            });
         }
+        window.cerrarEditor = () => document.getElementById('modal-editor').style.display = 'none';
 
-        window.cerrarEditor = () => {
-            document.getElementById('modal-editor').style.display = 'none';
+        window.aplicarParche = async () => {
+            if(!confirm("¿Sobrescribir los saldos? Esto no se registra en el historial.")) return;
+            
+            for(const u of usuarios) {
+                await updateDoc(doc(db, "usuario", u), {
+                    semanal: parseFloat(document.getElementById(`edit-${u}-sem`).value) || 0,
+                    ahorro: parseFloat(document.getElementById(`edit-${u}-aho`).value) || 0,
+                    emergencia: parseFloat(document.getElementById(`edit-${u}-eme`).value) || 0
+                });
+            }
+            alert("Parche aplicado a todos los usuarios 🛠️");
+            cerrarEditor();
         }
-
-        window.aplicarCambiosManuales = async () => {
-            if(!confirm("¿Estás seguro de sobrescribir los saldos manualmente?")) return;
-
-            const nuevosDatosRoger = {
-                semanal: parseFloat(document.getElementById('edit-r-sem').value),
-                ahorro: parseFloat(document.getElementById('edit-r-aho').value),
-                emergencia: parseFloat(document.getElementById('edit-r-eme').value)
-            };
-            const nuevosDatosMarian = {
-                semanal: parseFloat(document.getElementById('edit-m-sem').value),
-                ahorro: parseFloat(document.getElementById('edit-m-aho').value),
-                emergencia: parseFloat(document.getElementById('edit-m-eme').value)
-            };
-
-            try {
-                // Actualización directa (sobrescribir, no incrementar)
-                await updateDoc(rogerRef, nuevosDatosRoger);
-                await updateDoc(marianRef, nuevosDatosMarian);
-                alert("Saldos parchados correctamente 🛠️");
-                cerrarEditor();
-            } catch (e) { alert("Error al aplicar parche: " + e); }
-        }
-
     </script>
 </body>
 </html>
