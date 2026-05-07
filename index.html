@@ -3,212 +3,180 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>DuoFinanzas Pro</title>
+    <title>DuoFinanzas: Edición Ingeniería</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        :root { --main-bg: #fffbf0; --accent: #ff9a9e; }
-        body { background-color: var(--main-bg); font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; padding-bottom: 90px; color: #333; }
+        :root { --p-blue: #dbeafe; --p-pink: #fce7f3; --p-green: #d1fae5; --p-orange: #ffedd5; }
+        body { background-color: #fffaf5; font-family: 'Inter', sans-serif; padding-bottom: 100px; color: #444; }
         
-        /* Estilos de Perfil Pastel */
-        .theme-roger { --accent: #a1c4fd; --card-bg: #e0f2fe; }
-        .theme-marian { --accent: #fbc2eb; --card-bg: #fdf2f8; }
-        .theme-negocio { --accent: #a8e6cf; --card-bg: #ecfdf5; }
+        .theme-roger { --accent: #60a5fa; --bg-card: var(--p-blue); }
+        .theme-marian { --accent: #f472b6; --bg-card: var(--p-pink); }
+        .theme-negocio { --accent: #34d399; --bg-card: var(--p-green); }
 
         .view { display: none; }
-        .view.active { display: block; }
+        .view.active { display: block; animation: slideUp 0.3s ease-out; }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* Reloj Analógico */
-        .clock-container { position: relative; width: 80px; height: 80px; border: 3px solid #333; border-radius: 50%; background: white; margin: 10px auto; }
-        .hand { position: absolute; bottom: 50%; left: 50%; transform-origin: bottom; background: #333; border-radius: 5px; }
-        .hour { width: 4px; height: 20px; z-index: 3; }
-        .min { width: 3px; height: 30px; z-index: 2; }
-        .sec { width: 1px; height: 35px; background: red; z-index: 1; }
-        .center-dot { position: absolute; top: 50%; left: 50%; width: 8px; height: 8px; background: #333; border-radius: 50%; transform: translate(-50%, -50%); z-index: 4; }
+        .quick-btn { transition: all 0.2s; border: 1px solid rgba(0,0,0,0.05); }
+        .quick-btn:active { transform: scale(0.92); filter: brightness(0.9); }
 
-        /* Acordeón */
-        details summary { list-style: none; cursor: pointer; outline: none; }
-        details summary::-webkit-details-marker { display: none; }
-        
-        .section-card { background: white; border-radius: 20px; border: 2px solid #eee; margin-bottom: 12px; overflow: hidden; transition: all 0.3s; }
-        .section-card[open] { border-color: var(--accent); shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); }
-
-        .btn-profile { width: 35px; height: 35px; border-radius: 50%; font-weight: bold; display: flex; align-items: center; justify-content: center; border: 2px solid white; box-shadow: 0 2px 4px rgba(0,0,0,0.1); font-size: 14px; }
+        /* Reloj Minimalista */
+        .analog-clock { width: 60px; height: 60px; border: 2px solid #555; border-radius: 50%; position: relative; background: white; }
+        .hand { position: absolute; bottom: 50%; left: 50%; transform-origin: bottom; background: #333; border-radius: 4px; }
+        .h-hour { width: 3px; height: 15px; }
+        .h-min { width: 2px; height: 22px; }
+        .h-sec { width: 1px; height: 25px; background: #ff4d4d; }
     </style>
 </head>
 <body class="theme-roger">
 
-    <div class="bg-white p-4 shadow-sm sticky top-0 z-50 flex justify-between items-center border-b">
-        <div class="flex flex-col items-center">
-            <div class="clock-container">
-                <div class="center-dot"></div>
-                <div id="hour-hand" class="hand hour"></div>
-                <div id="min-hand" class="hand min"></div>
-                <div id="sec-hand" class="hand sec"></div>
+    <header class="bg-white/80 backdrop-blur-md sticky top-0 z-50 p-4 border-b flex justify-between items-center">
+        <div class="flex items-center gap-3">
+            <div class="analog-clock shadow-inner">
+                <div id="h-hour" class="hand h-hour"></div>
+                <div id="h-min" class="hand h-min"></div>
+                <div id="h-sec" class="hand h-sec"></div>
+                <div class="absolute top-1/2 left-1/2 w-2 h-2 bg-black rounded-full -translate-x-1/2 -translate-y-1/2"></div>
             </div>
-            <p id="date-display" class="text-[10px] font-bold text-gray-500 uppercase mt-1"></p>
-        </div>
-
-        <div class="text-right">
-            <h1 id="user-display-name" class="text-xl font-black text-gray-800">Roger</h1>
-            <div class="flex gap-2 mt-2">
-                <button onclick="setProfile('roger')" class="btn-profile bg-blue-200 text-blue-700">R</button>
-                <button onclick="setProfile('marian')" class="btn-profile bg-pink-200 text-pink-700">M</button>
-                <button onclick="setProfile('negocio')" class="btn-profile bg-emerald-200 text-emerald-700">N</button>
+            <div>
+                <p id="txt-fecha" class="text-[10px] font-black opacity-40 uppercase"></p>
+                <h1 id="txt-usuario" class="text-xl font-black text-gray-800 leading-none">Roger</h1>
             </div>
         </div>
-    </div>
+        <div class="flex gap-2">
+            <button onclick="switchUser('roger')" class="w-10 h-10 rounded-full bg-blue-100 border-2 border-blue-400 text-blue-600 font-bold">R</button>
+            <button onclick="switchUser('marian')" class="w-10 h-10 rounded-full bg-pink-100 border-2 border-pink-400 text-pink-600 font-bold">M</button>
+            <button onclick="switchUser('negocio')" class="w-10 h-10 rounded-full bg-emerald-100 border-2 border-emerald-400 text-emerald-600 font-bold">N</button>
+        </div>
+    </header>
 
-    <div id="view-home" class="view active max-w-md mx-auto p-4">
+    <main id="view-home" class="view active max-w-md mx-auto p-4 space-y-4">
         
-        <div class="bg-white p-6 rounded-[2rem] shadow-sm border-2 border-gray-100 mb-6 text-center">
-            <p class="text-xs font-bold text-gray-400 uppercase tracking-widest">Semanal / Caja</p>
-            <h2 id="saldo-semanal" class="text-5xl font-black my-2">Q0.00</h2>
-            <div class="flex justify-between border-t pt-4 mt-4">
-                <div>
-                    <p class="text-[10px] font-bold text-gray-400 uppercase">Ahorro</p>
-                    <p id="saldo-ahorro" class="font-bold text-lg">Q0.00</p>
-                </div>
-                <div>
-                    <p class="text-[10px] font-bold text-gray-400 uppercase">Hoy</p>
-                    <p id="gastos-hoy" class="font-bold text-lg text-red-500">Q0.00</p>
-                </div>
-            </div>
-        </div>
-
-        <details id="sec-pasajes" class="section-card">
-            <summary class="p-4 font-bold flex justify-between items-center bg-gray-50">
-                <span><i class="fa-solid fa-bus text-blue-400 mr-2"></i> Pasajes</span>
-                <i class="fa-solid fa-chevron-down text-xs"></i>
-            </summary>
-            <div class="p-4 space-y-3">
-                <div class="grid grid-cols-2 gap-2">
-                    <input type="number" id="psj-bus" placeholder="Bus (Q)" class="p-3 bg-gray-100 rounded-xl outline-none">
-                    <input type="number" id="psj-trans" placeholder="Trans (Q)" class="p-3 bg-gray-100 rounded-xl outline-none">
-                </div>
-                <button onclick="registrarPasaje(false)" class="w-full bg-blue-500 text-white py-3 rounded-xl font-bold">Solo yo</button>
-                
-                <div id="roger-extra" class="pt-3 border-t">
-                    <p class="text-[10px] font-bold text-gray-400 mb-2 uppercase text-center">¿Acompañaste a Marian?</p>
-                    <div class="flex gap-2">
-                        <input type="number" id="psj-marian" placeholder="Q extra" class="w-1/2 p-2 bg-purple-50 rounded-lg outline-none text-sm">
-                        <button onclick="registrarPasaje(true)" class="w-1/2 bg-purple-500 text-white p-2 rounded-lg text-xs font-bold">Yo pago ambos</button>
+        <div class="bg-white rounded-[2.5rem] p-6 shadow-sm border border-gray-100 text-center relative overflow-hidden">
+            <div class="relative z-10">
+                <p class="text-[10px] font-bold text-gray-400 uppercase tracking-tighter">Disponible para Gastar</p>
+                <h2 id="val-semanal" class="text-5xl font-black text-gray-800 my-1">Q0.00</h2>
+                <div class="flex justify-around mt-4 pt-4 border-t border-dashed">
+                    <div>
+                        <p class="text-[9px] font-bold text-gray-400">AHORRO</p>
+                        <p id="val-ahorro" class="font-bold text-blue-600">Q0.00</p>
+                    </div>
+                    <div>
+                        <p class="text-[9px] font-bold text-gray-400">GASTO HOY</p>
+                        <p id="val-hoy" class="font-bold text-red-500">Q0.00</p>
                     </div>
                 </div>
             </div>
-        </details>
-
-        <details class="section-card">
-            <summary class="p-4 font-bold flex justify-between items-center bg-gray-50">
-                <span><i class="fa-solid fa-money-bill-transfer text-green-400 mr-2"></i> Transacción</span>
-                <i class="fa-solid fa-chevron-down text-xs"></i>
-            </summary>
-            <div class="p-4 space-y-3">
-                <input type="number" id="monto-gen" placeholder="Monto Q" class="w-full text-2xl font-bold text-center border-b pb-2 outline-none">
-                <select id="tipo-gen" class="w-full p-3 rounded-xl bg-gray-100 font-bold">
-                    <option value="gasto_semanal">➖ Gasto Semanal</option>
-                    <option value="ingreso_semanal">➕ Ingreso Semanal</option>
-                    <option value="ingreso_ahorro">💰 Sumar a Ahorro</option>
-                    <option value="gasto_ahorro">💸 Sacar de Ahorro</option>
-                </select>
-                <input type="text" id="nota-gen" placeholder="Detalle (Ej: Almuerzo)" class="w-full p-3 bg-gray-50 rounded-xl outline-none">
-                <button onclick="ejecutarMovimiento()" class="w-full bg-gray-800 text-white py-4 rounded-xl font-bold">Guardar</button>
-            </div>
-        </details>
-
-        <details class="section-card">
-            <summary class="p-4 font-bold flex justify-between items-center bg-gray-50">
-                <span><i class="fa-solid fa-handshake text-orange-400 mr-2"></i> Préstamos</span>
-                <i class="fa-solid fa-chevron-down text-xs"></i>
-            </summary>
-            <div class="p-4 space-y-3">
-                <div class="grid grid-cols-2 gap-2">
-                    <input type="text" id="pres-nom" placeholder="¿Quién?" class="p-3 bg-gray-100 rounded-xl text-sm">
-                    <input type="number" id="pres-mon" placeholder="Monto Q" class="p-3 bg-gray-100 rounded-xl text-sm">
-                </div>
-                <input type="date" id="pres-fecha" class="w-full p-2 bg-gray-50 rounded-lg text-xs">
-                <button onclick="nuevoPrestamo()" class="w-full bg-orange-400 text-white py-3 rounded-xl font-bold">Registrar Deuda</button>
-                <div id="lista-prestamos" class="space-y-2 mt-4"></div>
-            </div>
-        </details>
-
-    </div>
-
-    <div id="view-calc" class="view max-w-md mx-auto p-4">
-        <div class="bg-white p-6 rounded-[2rem] shadow-sm">
-            <div class="bg-gray-100 p-6 rounded-2xl text-right mb-4">
-                <h2 id="calc-display" class="text-4xl font-black text-gray-800">0</h2>
-            </div>
-            <div class="grid grid-cols-4 gap-2">
-                <button onclick="calcIn('7')" class="bg-gray-50 p-6 rounded-xl font-bold">7</button>
-                <button onclick="calcIn('8')" class="bg-gray-50 p-6 rounded-xl font-bold">8</button>
-                <button onclick="calcIn('9')" class="bg-gray-50 p-6 rounded-xl font-bold">9</button>
-                <button onclick="calcIn('/')" class="bg-orange-100 text-orange-600 p-6 rounded-xl font-bold">/</button>
-                <button onclick="calcIn('4')" class="bg-gray-50 p-6 rounded-xl font-bold">4</button>
-                <button onclick="calcIn('5')" class="bg-gray-50 p-6 rounded-xl font-bold">5</button>
-                <button onclick="calcIn('6')" class="bg-gray-50 p-6 rounded-xl font-bold">6</button>
-                <button onclick="calcIn('*')" class="bg-orange-100 text-orange-600 p-6 rounded-xl font-bold">*</button>
-                <button onclick="calcIn('1')" class="bg-gray-50 p-6 rounded-xl font-bold">1</button>
-                <button onclick="calcIn('2')" class="bg-gray-50 p-6 rounded-xl font-bold">2</button>
-                <button onclick="calcIn('3')" class="bg-gray-50 p-6 rounded-xl font-bold">3</button>
-                <button onclick="calcIn('-')" class="bg-orange-100 text-orange-600 p-6 rounded-xl font-bold">-</button>
-                <button onclick="calcIn('C')" class="bg-red-100 text-red-600 p-6 rounded-xl font-bold">C</button>
-                <button onclick="calcIn('0')" class="bg-gray-50 p-6 rounded-xl font-bold">0</button>
-                <button onclick="calcRes()" class="bg-blue-500 text-white p-6 rounded-xl font-bold">=</button>
-                <button onclick="calcIn('+')" class="bg-orange-100 text-orange-600 p-6 rounded-xl font-bold">+</button>
-            </div>
-            <div id="calc-log" class="mt-4 text-xs text-gray-400 max-h-32 overflow-y-auto"></div>
         </div>
-    </div>
 
-    <div id="view-history" class="view max-w-md mx-auto p-4">
-        <h3 class="text-xl font-black mb-4">Actividad Reciente</h3>
-        <div id="full-history" class="space-y-3"></div>
-    </div>
+        <section class="space-y-2">
+            <h3 class="text-xs font-black text-gray-400 uppercase px-2">Acciones Rápidas ⚡</h3>
+            <div class="grid grid-cols-2 gap-2">
+                <button onclick="quickAdd(2, 'Transmetro')" class="quick-btn bg-white p-4 rounded-2xl flex items-center gap-3 shadow-sm">
+                    <span class="text-2xl">🚇</span>
+                    <div class="text-left"><p class="text-xs font-bold">Transmetro</p><p class="text-[10px] opacity-50">Q2.00</p></div>
+                </button>
+                <button onclick="quickAdd(7, 'Bus Diario')" id="btn-bus-r" class="quick-btn bg-white p-4 rounded-2xl flex items-center gap-3 shadow-sm">
+                    <span class="text-2xl">🚌</span>
+                    <div class="text-left"><p class="text-xs font-bold">Bus</p><p class="text-[10px] opacity-50">Q7.00</p></div>
+                </button>
+                <button onclick="quickAdd(15, 'Almuerzo U')" class="quick-btn bg-white p-4 rounded-2xl flex items-center gap-3 shadow-sm border-l-4 border-orange-300">
+                    <span class="text-2xl">🍱</span>
+                    <div class="text-left"><p class="text-xs font-bold">Almuerzo</p><p class="text-[10px] opacity-50">Q15.00</p></div>
+                </button>
+                <button onclick="quickAdd(5, 'Risitos/Snack')" class="quick-btn bg-white p-4 rounded-2xl flex items-center gap-3 shadow-sm">
+                    <span class="text-2xl">🍿</span>
+                    <div class="text-left"><p class="text-xs font-bold">Antojo</p><p class="text-[10px] opacity-50">Q5.00</p></div>
+                </button>
+            </div>
+        </section>
 
-    <div id="view-patch" class="view max-w-md mx-auto p-4">
-        <div class="bg-white p-6 rounded-[2rem] border-2 border-red-100">
-            <h2 class="text-xl font-black text-red-500 mb-4">🛠️ Parche Manual Pro</h2>
+        <div class="space-y-3">
+            <details class="bg-white rounded-2xl shadow-sm overflow-hidden group border border-transparent open:border-gray-200">
+                <summary class="p-4 font-black text-sm flex justify-between items-center cursor-pointer list-none">
+                    <span><i class="fa-solid fa-file-invoice-dollar mr-2 text-blue-400"></i> Registrar Personalizado</span>
+                    <i class="fa-solid fa-chevron-down text-[10px] transition-transform group-open:rotate-180"></i>
+                </summary>
+                <div class="p-4 pt-0 space-y-3 border-t border-gray-50">
+                    <input type="number" id="in-monto" placeholder="Q 0.00" class="w-full text-3xl font-black text-center py-2 outline-none border-b">
+                    <select id="in-tipo" class="w-full p-3 bg-gray-50 rounded-xl font-bold text-sm">
+                        <option value="gasto_semanal">➖ Gasto de Semanal</option>
+                        <option value="ingreso_semanal">➕ Ingreso a Semanal</option>
+                        <option value="ingreso_ahorro">💰 Meter a Ahorro</option>
+                        <option value="gasto_ahorro">💸 Sacar de Ahorro</option>
+                    </select>
+                    <input type="text" id="in-nota" placeholder="¿En qué se usó?" class="w-full p-3 bg-gray-50 rounded-xl text-sm outline-none">
+                    <button onclick="execTrans()" class="w-full bg-gray-800 text-white py-4 rounded-xl font-bold active:scale-95 transition-all">Guardar Movimiento</button>
+                </div>
+            </details>
+
+            <details class="bg-white rounded-2xl shadow-sm overflow-hidden group border border-transparent open:border-gray-200">
+                <summary class="p-4 font-black text-sm flex justify-between items-center cursor-pointer list-none">
+                    <span><i class="fa-solid fa-users-between-lines mr-2 text-orange-400"></i> Deudas / Temu / Familia</span>
+                    <i class="fa-solid fa-chevron-down text-[10px] transition-transform group-open:rotate-180"></i>
+                </summary>
+                <div class="p-4 pt-0 space-y-3 border-t border-gray-50">
+                    <div class="grid grid-cols-2 gap-2">
+                        <input type="text" id="d-nombre" placeholder="Nombre" class="p-3 bg-gray-50 rounded-xl text-sm">
+                        <input type="number" id="d-monto" placeholder="Monto Q" class="p-3 bg-gray-50 rounded-xl text-sm">
+                    </div>
+                    <button onclick="addDeuda()" class="w-full bg-orange-100 text-orange-700 py-3 rounded-xl font-bold text-sm">Anotar Deuda</button>
+                    <div id="list-deudas" class="space-y-2 mt-4"></div>
+                </div>
+            </details>
+        </div>
+    </main>
+
+    <main id="view-calc" class="view max-w-md mx-auto p-4">
+        <div class="bg-white rounded-[2.5rem] p-6 shadow-sm">
+            <div class="bg-gray-50 p-6 rounded-2xl text-right mb-4">
+                <h2 id="calc-res" class="text-4xl font-black text-gray-800">0</h2>
+            </div>
+            <div class="grid grid-cols-4 gap-2" id="calc-btns">
+                </div>
+        </div>
+    </main>
+
+    <main id="view-hist" class="view max-w-md mx-auto p-4">
+        <div class="flex justify-between items-end mb-6">
+            <h2 class="text-2xl font-black">Historial</h2>
+            <button onclick="limpiarHistorialTodo()" class="text-[10px] font-bold text-red-400">LIMPIAR TODO</button>
+        </div>
+        <div id="list-historial" class="space-y-3"></div>
+    </main>
+
+    <main id="view-patch" class="view max-w-md mx-auto p-4">
+        <div class="bg-white rounded-[2.5rem] p-6 border-2 border-red-50">
+            <h2 class="text-xl font-black text-red-500 mb-2 italic">🛠️ Modo Edición Total</h2>
+            <p class="text-[10px] text-gray-400 mb-6 font-bold uppercase">Usa esto para corregir errores sin generar historial.</p>
             <div class="space-y-4">
-                <div>
-                    <label class="text-[10px] font-bold text-gray-400">SEMANAL / CAJA</label>
-                    <input type="number" id="p-sem" class="w-full p-4 bg-gray-50 rounded-xl font-bold">
-                </div>
-                <div>
-                    <label class="text-[10px] font-bold text-gray-400">AHORRO TOTAL</label>
-                    <input type="number" id="p-aho" class="w-full p-4 bg-gray-50 rounded-xl font-bold">
-                </div>
-                <div>
-                    <label class="text-[10px] font-bold text-gray-400">GASTOS DE HOY (ACUMULADO)</label>
-                    <input type="number" id="p-hoy" class="w-full p-4 bg-gray-50 rounded-xl font-bold">
-                </div>
-                <button onclick="aplicarParche()" class="w-full bg-red-500 text-white py-4 rounded-xl font-black">ACTUALIZAR BASE DE DATOS</button>
+                <div><label class="text-[10px] font-bold ml-2">SALDO SEMANAL</label><input type="number" id="p-sem" class="w-full p-4 bg-gray-50 rounded-2xl font-bold text-xl"></div>
+                <div><label class="text-[10px] font-bold ml-2">AHORRO TOTAL</label><input type="number" id="p-aho" class="w-full p-4 bg-gray-50 rounded-2xl font-bold text-xl"></div>
+                <div><label class="text-[10px] font-bold ml-2">GASTO DE HOY</label><input type="number" id="p-hoy" class="w-full p-4 bg-gray-50 rounded-2xl font-bold text-xl"></div>
+                <button onclick="savePatch()" class="w-full bg-red-500 text-white py-5 rounded-2xl font-black shadow-lg shadow-red-100">SOBRESCRIBIR SISTEMA</button>
             </div>
         </div>
-    </div>
+    </main>
 
-    <nav class="fixed bottom-0 left-0 right-0 bg-white border-t flex justify-around p-3 z-50">
-        <button onclick="showView('home')" class="flex flex-col items-center gap-1 text-gray-400 active:text-blue-500">
-            <i class="fa-solid fa-house"></i>
-            <span class="text-[10px] font-bold">Inicio</span>
+    <nav class="fixed bottom-0 left-0 right-0 bg-white/90 backdrop-blur-md border-t flex justify-around p-4 z-50">
+        <button onclick="showView('home')" class="flex flex-col items-center gap-1 text-gray-400 hover:text-gray-800">
+            <i class="fa-solid fa-house-user text-xl"></i><span class="text-[9px] font-black uppercase">Inicio</span>
         </button>
-        <button onclick="showView('calc')" class="flex flex-col items-center gap-1 text-gray-400 active:text-blue-500">
-            <i class="fa-solid fa-calculator"></i>
-            <span class="text-[10px] font-bold">Calc</span>
+        <button onclick="showView('calc')" class="flex flex-col items-center gap-1 text-gray-400 hover:text-gray-800">
+            <i class="fa-solid fa-calculator text-xl"></i><span class="text-[9px] font-black uppercase">Calc</span>
         </button>
-        <button onclick="showView('history')" class="flex flex-col items-center gap-1 text-gray-400 active:text-blue-500">
-            <i class="fa-solid fa-list-ul"></i>
-            <span class="text-[10px] font-bold">Historial</span>
+        <button onclick="showView('hist')" class="flex flex-col items-center gap-1 text-gray-400 hover:text-gray-800">
+            <i class="fa-solid fa-receipt text-xl"></i><span class="text-[9px] font-black uppercase">Historial</span>
         </button>
-        <button onclick="showView('patch')" class="flex flex-col items-center gap-1 text-gray-400 active:text-blue-500">
-            <i class="fa-solid fa-screwdriver-wrench"></i>
-            <span class="text-[10px] font-bold">Parche</span>
+        <button onclick="showView('patch')" class="flex flex-col items-center gap-1 text-gray-400 hover:text-gray-800">
+            <i class="fa-solid fa-wrench text-xl"></i><span class="text-[9px] font-black uppercase">Parche</span>
         </button>
     </nav>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getFirestore, doc, onSnapshot, updateDoc, increment, setDoc, collection, addDoc, query, orderBy, limit } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { getFirestore, doc, onSnapshot, updateDoc, increment, setDoc, collection, addDoc, query, orderBy, limit, deleteDoc, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyBrpGejWy2Xstf_KiqkNSlfknl3HaBhyyE",
@@ -222,82 +190,69 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
         
-        let usuarioActual = 'roger';
-        let datos = {};
+        let currentUser = 'roger';
+        let userData = {};
 
-        // --- RELOJ ---
+        // RELOJ
         setInterval(() => {
-            const now = new Date();
-            const h = now.getHours() * 30 + now.getMinutes() * 0.5;
-            const m = now.getMinutes() * 6;
-            const s = now.getSeconds() * 6;
-            document.getElementById('hour-hand').style.transform = `translateX(-50%) rotate(${h}deg)`;
-            document.getElementById('min-hand').style.transform = `translateX(-50%) rotate(${m}deg)`;
-            document.getElementById('sec-hand').style.transform = `translateX(-50%) rotate(${s}deg)`;
-            document.getElementById('date-display').innerText = now.toLocaleDateString('es-GT', { weekday: 'short', day: 'numeric', month: 'short' });
+            const n = new Date();
+            document.getElementById('h-hour').style.transform = `translateX(-50%) rotate(${n.getHours()*30 + n.getMinutes()*0.5}deg)`;
+            document.getElementById('h-min').style.transform = `translateX(-50%) rotate(${n.getMinutes()*6}deg)`;
+            document.getElementById('h-sec').style.transform = `translateX(-50%) rotate(${n.getSeconds()*6}deg)`;
+            document.getElementById('txt-fecha').innerText = n.toLocaleDateString('es-GT', { weekday:'long', day:'numeric', month:'short' });
         }, 1000);
 
-        // --- PERFILES ---
-        window.setProfile = (u) => {
-            usuarioActual = u;
+        // NAVEGACION Y USUARIO
+        window.switchUser = (u) => {
+            currentUser = u;
             document.body.className = `theme-${u}`;
-            document.getElementById('user-display-name').innerText = u.charAt(0).toUpperCase() + u.slice(1);
-            document.getElementById('roger-extra').style.display = (u === 'roger') ? 'block' : 'none';
-            document.getElementById('sec-pasajes').style.display = (u === 'negocio') ? 'none' : 'block';
+            document.getElementById('txt-usuario').innerText = u.charAt(0).toUpperCase() + u.slice(1);
+            document.getElementById('btn-bus-r').style.display = (u === 'marian') ? 'none' : 'flex';
             renderUI();
         };
 
-        window.showView = (v) => {
-            document.querySelectorAll('.view').forEach(x => x.classList.remove('active'));
-            document.getElementById('view-' + v).classList.add('active');
+        window.showView = (id) => {
+            document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+            document.getElementById('view-'+id).classList.add('active');
         };
 
-        // --- FIREBASE ---
+        // FIREBASE SYNC
         ['roger', 'marian', 'negocio'].forEach(u => {
             onSnapshot(doc(db, "usuario", u), (s) => {
                 if(s.exists()) {
-                    datos[u] = s.data();
-                    if(u === usuarioActual) renderUI();
+                    userData[u] = s.data();
+                    if(u === currentUser) renderUI();
                 }
             });
         });
 
         function renderUI() {
-            const d = datos[usuarioActual];
+            const d = userData[currentUser];
             if(!d) return;
-            document.getElementById('saldo-semanal').innerText = `Q${d.semanal.toFixed(2)}`;
-            document.getElementById('saldo-ahorro').innerText = `Q${d.ahorro.toFixed(2)}`;
-            document.getElementById('gastos-hoy').innerText = `Q${d.gastosHoy.toFixed(2)}`;
+            document.getElementById('val-semanal').innerText = `Q${d.semanal.toFixed(2)}`;
+            document.getElementById('val-ahorro').innerText = `Q${d.ahorro.toFixed(2)}`;
+            document.getElementById('val-hoy').innerText = `Q${d.gastosHoy.toFixed(2)}`;
             
             document.getElementById('p-sem').value = d.semanal;
             document.getElementById('p-aho').value = d.ahorro;
             document.getElementById('p-hoy').value = d.gastosHoy;
             
-            cargarHistorial();
-            cargarPrestamos();
+            fetchHistory();
+            fetchDeudas();
         }
 
-        // --- ACCIONES ---
-        window.registrarPasaje = async (doble) => {
-            const b = parseFloat(document.getElementById('psj-bus').value) || 0;
-            const t = parseFloat(document.getElementById('psj-trans').value) || 0;
-            const extra = doble ? (parseFloat(document.getElementById('psj-marian').value) || 0) : 0;
-            const total = b + t + extra;
-
-            if(total <= 0) return;
-            await updateDoc(doc(db, "usuario", usuarioActual), { semanal: increment(-total), gastosHoy: increment(total) });
+        // ACCIONES
+        window.quickAdd = async (monto, desc) => {
+            await updateDoc(doc(db, "usuario", currentUser), { semanal: increment(-monto), gastosHoy: increment(monto) });
             await addDoc(collection(db, "movimientos"), {
-                usuario: usuarioActual, tipo: "gasto", monto: total, cuenta: "SEMANAL", 
-                detalle: doble ? "Pasaje + Marian" : "Pasaje Personal", fechaIso: new Date().toISOString(),
-                fechaLegible: new Date().toLocaleString()
+                u: currentUser, tipo: 'gasto', m: monto, nota: desc, c: 'SEMANAL', t: new Date().toISOString()
             });
-            alert("Gasto de transporte guardado");
         };
 
-        window.ejecutarMovimiento = async () => {
-            const m = parseFloat(document.getElementById('monto-gen').value);
-            const t = document.getElementById('tipo-gen').value;
-            const n = document.getElementById('nota-gen').value || "Sin detalle";
+        window.execTrans = async () => {
+            const m = parseFloat(document.getElementById('in-monto').value);
+            const t = document.getElementById('in-tipo').value;
+            const n = document.getElementById('in-nota').value || "Sin nota";
             if(!m) return;
 
             let upd = {};
@@ -306,80 +261,88 @@
             if(t === 'ingreso_ahorro') upd = { ahorro: increment(m) };
             if(t === 'gasto_ahorro') upd = { ahorro: increment(-m) };
 
-            await updateDoc(doc(db, "usuario", usuarioActual), upd);
+            await updateDoc(doc(db, "usuario", currentUser), upd);
             await addDoc(collection(db, "movimientos"), {
-                usuario: usuarioActual, tipo: t.includes('gasto') ? "gasto" : "ingreso", 
-                monto: m, cuenta: t.includes('semanal') ? "SEMANAL" : "AHORRO",
-                detalle: n, fechaIso: new Date().toISOString(), fechaLegible: new Date().toLocaleString()
+                u: currentUser, tipo: t.includes('gasto')?'gasto':'ingreso', m, nota: n, c: t.includes('semanal')?'SEMANAL':'AHORRO', t: new Date().toISOString()
             });
-            document.getElementById('monto-gen').value = "";
+            document.getElementById('in-monto').value = "";
         };
 
-        window.nuevoPrestamo = async () => {
-            const nom = document.getElementById('pres-nom').value;
-            const mon = parseFloat(document.getElementById('pres-mon').value);
-            const fec = document.getElementById('pres-fecha').value || new Date().toLocaleDateString();
-            if(!nom || !mon) return;
-
-            await addDoc(collection(db, "prestamos"), { 
-                deudor: usuarioActual, quien: nom, monto: mon, fecha: fec, pagado: false 
-            });
-            await updateDoc(doc(db, "usuario", usuarioActual), { semanal: increment(mon) });
-            alert("Préstamo registrado!");
+        window.addDeuda = async () => {
+            const n = document.getElementById('d-nombre').value;
+            const m = parseFloat(document.getElementById('d-monto').value);
+            if(!n || !m) return;
+            await addDoc(collection(db, "prestamos"), { u: currentUser, nom: n, m, p: false, t: new Date().toLocaleDateString() });
+            document.getElementById('d-nombre').value = ""; document.getElementById('d-monto').value = "";
         };
 
-        function cargarHistorial() {
-            const q = query(collection(db, "movimientos"), orderBy("fechaIso", "desc"), limit(20));
-            onSnapshot(q, (s) => {
-                const cont = document.getElementById('full-history');
-                cont.innerHTML = "";
-                s.docs.forEach(doc => {
-                    const m = doc.data();
-                    if(m.usuario !== usuarioActual) return;
-                    cont.innerHTML += `
-                        <div class="bg-white p-4 rounded-xl border shadow-sm flex justify-between">
-                            <div><p class="font-bold">${m.detalle}</p><p class="text-[10px] text-gray-400">${m.fechaLegible}</p></div>
-                            <p class="font-bold ${m.tipo==='gasto'?'text-red-400':'text-green-400'}">Q${m.monto}</p>
-                        </div>`;
-                });
-            });
-        }
-
-        function cargarPrestamos() {
+        function fetchDeudas() {
             onSnapshot(collection(db, "prestamos"), (s) => {
-                const list = document.getElementById('lista-prestamos');
-                list.innerHTML = "";
-                s.docs.forEach(d => {
-                    const p = d.data();
-                    if(p.deudor === usuarioActual && !p.pagado) {
-                        list.innerHTML += `
-                            <div class="bg-orange-50 p-3 rounded-xl flex justify-between items-center text-xs border border-orange-100">
-                                <span><b>${p.quien}</b> (Q${p.monto}) - ${p.fecha}</span>
-                                <button onclick="pagarP('${d.id}', ${p.monto})" class="bg-orange-400 text-white px-3 py-1 rounded-lg">Pagar</button>
-                            </div>`;
+                const l = document.getElementById('list-deudas'); l.innerHTML = "";
+                s.docs.forEach(docSnap => {
+                    const d = docSnap.data();
+                    if(d.u === currentUser && !d.p) {
+                        l.innerHTML += `<div class="bg-orange-50 p-3 rounded-xl flex justify-between items-center border border-orange-100">
+                            <div><p class="text-xs font-bold">${d.nom}</p><p class="text-[10px] opacity-50">${d.t}</p></div>
+                            <div class="flex items-center gap-2"><span class="font-bold text-sm">Q${d.m}</span>
+                            <button onclick="payDeuda('${docSnap.id}', ${d.m})" class="bg-orange-400 text-white text-[9px] px-3 py-2 rounded-lg font-bold">PAGAR</button></div>
+                        </div>`;
                     }
                 });
             });
         }
 
-        window.pagarP = async (id, m) => {
-            await updateDoc(doc(db, "prestamos", id), { pagado: true });
-            await updateDoc(doc(db, "usuario", usuarioActual), { semanal: increment(-m) });
+        window.payDeuda = async (id, m) => {
+            if(!confirm("¿Descontar Q"+m+" de tu semanal?")) return;
+            await updateDoc(doc(db, "prestamos", id), { p: true });
+            await updateDoc(doc(db, "usuario", currentUser), { semanal: increment(-m), gastosHoy: increment(m) });
+            await addDoc(collection(db, "movimientos"), { u: currentUser, tipo: 'gasto', m, nota: "Pago de deuda", c: 'SEMANAL', t: new Date().toISOString() });
         };
 
-        window.aplicarParche = async () => {
+        function fetchHistory() {
+            const q = query(collection(db, "movimientos"), orderBy("t", "desc"), limit(20));
+            onSnapshot(q, (s) => {
+                const l = document.getElementById('list-historial'); l.innerHTML = "";
+                s.docs.forEach(docSnap => {
+                    const h = docSnap.data();
+                    if(h.u !== currentUser) return;
+                    l.innerHTML += `<div class="bg-white p-4 rounded-2xl flex justify-between items-center shadow-sm border-l-4 ${h.tipo==='gasto'?'border-red-300':'border-green-300'}">
+                        <div><p class="text-xs font-black">${h.nota}</p><p class="text-[9px] opacity-40">${new Date(h.t).toLocaleString()}</p></div>
+                        <p class="font-black ${h.tipo==='gasto'?'text-red-500':'text-green-600'}">${h.tipo==='gasto'?'-':'+'} Q${h.m.toFixed(2)}</p>
+                    </div>`;
+                });
+            });
+        }
+
+        window.savePatch = async () => {
             const s = parseFloat(document.getElementById('p-sem').value);
             const a = parseFloat(document.getElementById('p-aho').value);
             const h = parseFloat(document.getElementById('p-hoy').value);
-            await updateDoc(doc(db, "usuario", usuarioActual), { semanal: s, ahorro: a, gastosHoy: h });
-            alert("Datos de base de datos corregidos 🛠️");
+            await updateDoc(doc(db, "usuario", currentUser), { semanal: s, ahorro: a, gastosHoy: h });
+            alert("Base de Datos Sincronizada 🚀");
         };
 
-        // --- CALCULADORA ---
-        let cStr = "";
-        window.calcIn = (v) => { if(v==='C') cStr=""; else cStr+=v; document.getElementById('calc-display').innerText = cStr || "0"; };
-        window.calcRes = () => { try { let r = eval(cStr); document.getElementById('calc-log').innerHTML += `<p>${cStr} = ${r}</p>`; cStr=r.toString(); document.getElementById('calc-display').innerText=cStr; } catch{ cStr=""; } };
+        // CALCULADORA MEJORADA
+        const cB = document.getElementById('calc-btns');
+        ["C", "÷", "×", "DEL", "7", "8", "9", "-", "4", "5", "6", "+", "1", "2", "3", "=", "0", ".", " ( ", " ) "].forEach(t => {
+            const b = document.createElement('button');
+            b.innerText = t;
+            b.className = "p-5 bg-gray-50 rounded-2xl font-bold text-lg active:bg-gray-200";
+            if(["="].includes(t)) b.className += " bg-blue-500 text-white";
+            if(["C", "DEL"].includes(t)) b.className += " text-red-500";
+            b.onclick = () => doCalc(t);
+            cB.appendChild(b);
+        });
 
+        let curExp = "";
+        function doCalc(t) {
+            const res = document.getElementById('calc-res');
+            if(t === "C") curExp = "";
+            else if(t === "DEL") curExp = curExp.slice(0, -1);
+            else if(t === "=") { try { curExp = eval(curExp.replace('×','*').replace('÷','/')).toString(); } catch { curExp = "Error"; } }
+            else curExp += t;
+            res.innerText = curExp || "0";
+        }
     </script>
 </body>
 </html>
