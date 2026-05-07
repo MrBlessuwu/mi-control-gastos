@@ -140,121 +140,253 @@ details summary::-webkit-details-marker {
 
     </div>
 
-    <!-- ACCESOS RAPIDOS -->
-    <div class="grid grid-cols-2 gap-3">
-
-        <button onclick="accionRapida(2, 'Pasaje Ida/Vuelta')" class="glass-card p-4 flex flex-col items-center active:scale-95">
-            <span class="text-2xl">🚇</span>
-            <span class="text-[9px] font-black uppercase mt-1">Direct Q2</span>
-        </button>
-
-        <button onclick="accionRapida(5, 'Recarga Tarjeta')" class="glass-card p-4 flex flex-col items-center active:scale-95">
-            <span class="text-2xl">💳</span>
-            <span class="text-[9px] font-black uppercase mt-1">Recarga Q5</span>
-        </button>
-
-    </div>
-
-    <!-- PASAJES -->
-    <div id="seccion-pasajes" class="glass-card p-5">
-
-        <h3 class="font-bold mb-3 flex items-center gap-2">
-            <i class="fa-solid fa-bus"></i> Pasajes Variables
-        </h3>
-
-        <div class="grid grid-cols-2 gap-2 mb-3">
-            <input type="number" id="p-bus" placeholder="Bus Q" class="p-3 rounded-xl bg-white/60 text-sm">
-            <input type="number" id="p-trans" placeholder="Transmetro Q" class="p-3 rounded-xl bg-white/60 text-sm">
-        </div>
-
-        <div class="grid grid-cols-2 gap-2">
-            <button onclick="calcPasaje(1)" class="bg-white/60 py-3 rounded-xl font-black text-xs">IDA O VUELTA</button>
-            <button onclick="calcPasaje(2)" class="bg-black/10 py-3 rounded-xl font-black text-xs">AMBOS</button>
-        </div>
-
-        <!-- ACOMPAÑAR -->
-        <div id="bloque-acompanar" class="mt-3 hidden">
-
-            <div class="flex gap-2 mb-2">
-                <input type="number" id="monto-acompanar" placeholder="Monto Q" class="w-full p-3 rounded-xl bg-white/60 text-sm">
-            </div>
-
-            <button onclick="acompaniarMarian()" class="w-full bg-indigo-100 text-indigo-700 py-3 rounded-xl font-black text-[10px]">
-                ➕ ACOMPAÑAR A MARIAN
-            </button>
-
-        </div>
-
-    </div>
-
-    <!-- GASTO / INGRESO -->
-    <details class="glass-card overflow-hidden group">
-
+    <!-- =========================
+    SECCIÓN PASAJES
+    ========================= -->
+    <details id="seccion-pasajes" class="glass-card overflow-hidden group">
         <summary class="p-5 font-black text-sm flex justify-between items-center cursor-pointer">
-            <span><i class="fa-solid fa-pen-to-square mr-2"></i> Gasto / Ingreso Manual</span>
-            <i class="fa-solid fa-plus text-[10px] transition-transform group-open:rotate-45"></i>
+            <span>🚌 Pasajes</span>
+            <i class="fa-solid fa-minus text-[10px] transition-transform group-open:rotate-180"></i>
         </summary>
 
-        <div class="p-5 pt-0 space-y-3">
-
-            <input type="number" id="monto-m" placeholder="Q 0.00" class="w-full text-3xl font-black text-center bg-transparent border-b-2 border-black/10 outline-none pb-2">
-
-            <select id="tipo-m" class="w-full p-3 rounded-2xl bg-white/50 font-bold text-xs">
-                <option value="gasto_semanal">➖ Gasto de Semanal</option>
-                <option value="ingreso_semanal">➕ Ingreso a Semanal</option>
-                <option value="ingreso_ahorro">💰 Ingreso a Ahorro</option>
-                <option value="gasto_ahorro">💸 Gasto de Ahorro</option>
-            </select>
-
-            <input type="text" id="nota-m" placeholder="Detalle del movimiento" class="w-full p-3 rounded-2xl bg-white/50 text-xs outline-none">
-
-            <button onclick="guardarManual()" class="w-full py-4 rounded-2xl font-black shadow-lg btn-main">
-                GUARDAR
-            </button>
-
+        <div class="p-5 pt-0">
+            <!-- CONTENIDO -->
         </div>
-
     </details>
 
-    <!-- PRESTAMOS -->
-    <div class="glass-card p-5">
+    <!-- =========================
+    BOTONES RÁPIDOS
+    ========================= -->
+    <div id="acciones-rapidas" class="grid grid-cols-2 gap-3">
+        
+        <button onclick="accionRapida(2, 'Ida/Vuelta Transmetro')"
+            class="glass-card p-4 flex flex-col items-center active:scale-95">
 
-        <h3 class="font-bold text-sm mb-4">
-            <i class="fa-solid fa-hand-holding-dollar mr-2"></i>
-            Sistema de Préstamos
-        </h3>
+            <span class="text-2xl">🚇</span>
 
-        <div class="space-y-2 mb-4">
+            <span class="text-[9px] font-black uppercase mt-1">
+                -Q2 IDA/VUELTA
+            </span>
+        </button>
 
-            <input type="text" id="prestamo-quien" placeholder="¿Quién?" class="w-full p-3 rounded-xl bg-white/60 text-sm">
+        <button onclick="accionRapida(5, 'Recarga Tarjeta')"
+            class="glass-card p-4 flex flex-col items-center active:scale-95">
 
-            <div class="grid grid-cols-2 gap-2">
-                <input type="number" id="prestamo-monto" placeholder="Monto Q" class="p-3 rounded-xl bg-white/60 text-sm">
-                <input type="date" id="prestamo-fecha" class="p-3 rounded-xl bg-white/60 text-sm">
+            <span class="text-2xl">💳</span>
+
+            <span class="text-[9px] font-black uppercase mt-1">
+                -Q5 RECARGA
+            </span>
+        </button>
+    </div>
+
+    <!-- =========================
+    GASTO / INGRESO
+    ========================= -->
+    <details class="glass-card overflow-hidden group">
+        <summary class="p-5 font-black text-sm flex justify-between items-center cursor-pointer">
+            <span>💸 Gasto / Ingreso Manual</span>
+
+            <i class="fa-solid fa-minus text-[10px] transition-transform group-open:rotate-180"></i>
+        </summary>
+
+        <div class="p-5 pt-0">
+            <!-- CONTENIDO -->
+        </div>
+    </details>
+
+    <!-- =========================
+    PRÉSTAMOS
+    ========================= -->
+    <details class="glass-card overflow-hidden group">
+        <summary class="p-5 font-black text-sm flex justify-between items-center cursor-pointer">
+            <span>🤝 Préstamos</span>
+
+            <i class="fa-solid fa-minus text-[10px] transition-transform group-open:rotate-180"></i>
+        </summary>
+
+        <div class="p-5 pt-0 space-y-4">
+
+            <!-- DEUDAS CONTRA NOSOTROS -->
+            <div>
+                <h3 class="font-black text-xs uppercase opacity-60 mb-2">
+                    Nos deben
+                </h3>
+
+                <div class="grid grid-cols-2 gap-2 mb-2">
+                    <input type="text" id="debe-quien"
+                        placeholder="¿Quién debe?"
+                        class="p-3 rounded-xl bg-white/50 text-xs">
+
+                    <input type="number" id="debe-cuanto"
+                        placeholder="Q"
+                        class="p-3 rounded-xl bg-white/50 text-xs">
+                </div>
+
+                <input type="date" id="debe-fecha"
+                    class="w-full p-3 rounded-xl bg-white/50 text-xs mb-2">
+
+                <button onclick="nuevaDeudaFavor()"
+                    class="w-full py-3 rounded-xl bg-green-500 text-white font-black text-[10px] uppercase">
+                    Guardar préstamo a favor
+                </button>
             </div>
 
-            <select id="prestamo-tipo" class="w-full p-3 rounded-xl bg-white/60 text-sm font-bold">
-                <option value="debemos">💸 Nosotros debemos</option>
-                <option value="nosdeben">💰 Nos deben</option>
-            </select>
+            <!-- DEUDAS NUESTRAS -->
+            <div class="pt-4 border-t border-black/5">
 
-            <select id="prestamo-cuenta" class="w-full p-3 rounded-xl bg-white/60 text-sm font-bold">
-                <option value="semanal">Usar cuenta semanal</option>
-                <option value="ahorro">Usar cuenta ahorro</option>
-            </select>
+                <h3 class="font-black text-xs uppercase opacity-60 mb-2">
+                    Debemos
+                </h3>
 
-            <button onclick="registrarPrestamo()" class="w-full bg-black/10 py-3 rounded-xl font-black text-xs">
-                REGISTRAR PRÉSTAMO
+                <div class="grid grid-cols-2 gap-2 mb-2">
+                    <input type="text" id="deuda-quien"
+                        placeholder="¿A quién?"
+                        class="p-3 rounded-xl bg-white/50 text-xs">
+
+                    <input type="number" id="deuda-cuanto"
+                        placeholder="Q"
+                        class="p-3 rounded-xl bg-white/50 text-xs">
+                </div>
+
+                <input type="date" id="deuda-fecha"
+                    class="w-full p-3 rounded-xl bg-white/50 text-xs mb-2">
+
+                <button onclick="nuevaDeudaContra()"
+                    class="w-full py-3 rounded-xl bg-red-500 text-white font-black text-[10px] uppercase">
+                    Guardar deuda
+                </button>
+            </div>
+
+            <!-- LISTAS -->
+            <div id="lista-deudas" class="space-y-2 pt-4"></div>
+
+        </div>
+    </details>
+
+    <!-- =========================
+    HISTORIAL
+    ========================= -->
+    <details class="glass-card overflow-hidden group" open>
+        <summary class="p-5 font-black text-sm flex justify-between items-center cursor-pointer">
+            <span>📜 Historial General</span>
+
+            <i class="fa-solid fa-minus text-[10px] transition-transform group-open:rotate-180"></i>
+        </summary>
+
+        <div class="p-5 pt-0">
+
+            <!-- ENERO -->
+            <div class="mb-5">
+                <div class="bg-black text-white text-[10px] font-black uppercase px-3 py-2 rounded-xl inline-block mb-3">
+                    Enero 2026
+                </div>
+
+                <div id="historial-enero" class="space-y-2"></div>
+            </div>
+
+            <!-- FEBRERO -->
+            <div class="mb-5">
+                <div class="bg-black text-white text-[10px] font-black uppercase px-3 py-2 rounded-xl inline-block mb-3">
+                    Febrero 2026
+                </div>
+
+                <div id="historial-febrero" class="space-y-2"></div>
+            </div>
+
+        </div>
+    </details>
+
+    <!-- =========================
+    PARCHE
+    ========================= -->
+    <details class="glass-card overflow-hidden group">
+        <summary class="p-5 font-black text-sm flex justify-between items-center cursor-pointer">
+            <span>🛠️ Parche</span>
+
+            <i class="fa-solid fa-minus text-[10px] transition-transform group-open:rotate-180"></i>
+        </summary>
+
+        <div class="p-5 pt-0 space-y-5">
+
+            <!-- SEMANAL -->
+            <div>
+                <label class="text-[10px] font-black uppercase opacity-50">
+                    Corregir Semanal
+                </label>
+
+                <input type="number" id="p-sem"
+                    class="w-full p-4 rounded-2xl bg-white/50 font-bold border">
+            </div>
+
+            <!-- AHORRO -->
+            <div>
+                <label class="text-[10px] font-black uppercase opacity-50">
+                    Corregir Ahorro
+                </label>
+
+                <input type="number" id="p-aho"
+                    class="w-full p-4 rounded-2xl bg-white/50 font-bold border">
+            </div>
+
+            <!-- EMERGENCIA -->
+            <div>
+                <label class="text-[10px] font-black uppercase opacity-50">
+                    Corregir Emergencia
+                </label>
+
+                <input type="number" id="p-eme"
+                    class="w-full p-4 rounded-2xl bg-white/50 font-bold border">
+            </div>
+
+            <button onclick="aplicarParche()"
+                class="w-full bg-red-600 text-white py-4 rounded-2xl font-black shadow-lg">
+                SOBRESCRIBIR SALDOS
             </button>
 
-        </div>
+            <!-- BORRAR HISTORIAL POR MES -->
+            <div class="pt-6 border-t border-black/5">
 
-        <div>
-            <h4 class="font-black text-[10px] uppercase opacity-50 mb-2">Pendientes</h4>
-            <div id="lista-prestamos" class="space-y-2"></div>
-        </div>
+                <h3 class="text-[10px] font-black uppercase opacity-50 mb-3">
+                    Borrar historial por mes
+                </h3>
 
-    </div>
+                <div class="grid grid-cols-2 gap-2 mb-3">
+
+                    <select id="mes-borrar"
+                        class="p-3 rounded-xl bg-white/50 text-xs">
+
+                        <option value="0">Enero</option>
+                        <option value="1">Febrero</option>
+                        <option value="2">Marzo</option>
+                        <option value="3">Abril</option>
+                        <option value="4">Mayo</option>
+                        <option value="5">Junio</option>
+                        <option value="6">Julio</option>
+                        <option value="7">Agosto</option>
+                        <option value="8">Septiembre</option>
+                        <option value="9">Octubre</option>
+                        <option value="10">Noviembre</option>
+                        <option value="11">Diciembre</option>
+
+                    </select>
+
+                    <input type="number"
+                        id="anio-borrar"
+                        placeholder="2026"
+                        class="p-3 rounded-xl bg-white/50 text-xs">
+                </div>
+
+                <button onclick="borrarHistorialMes()"
+                    class="w-full bg-black text-white py-3 rounded-xl font-black text-[10px] uppercase">
+
+                    Borrar historial del mes
+                </button>
+
+            </div>
+
+        </div>
+    </details>
 
 </main>
 
@@ -353,7 +485,9 @@ import {
     addDoc,
     query,
     orderBy,
-    limit
+    limit,
+    getDocs,
+    deleteDoc
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 const firebaseConfig = {
@@ -450,12 +584,20 @@ function render() {
 
     document.body.className = `theme-${usuarioActivo}`;
 
-    // NEGOCIO SIN PASAJES
-    document.getElementById('seccion-pasajes').style.display = usuarioActivo === 'negocio' ? 'none' : 'block';
+    // NUEVA UI CONTROL
+    actualizarUI();
 
-    // ACOMPAÑAR SOLO ROGER
-    document.getElementById('bloque-acompanar').style.display = usuarioActivo === 'roger' ? 'block' : 'none';
+}
 
+function actualizarUI() {
+
+    const esNegocio = usuarioActivo === 'negocio';
+
+    const accionesRapidas = document.getElementById('acciones-rapidas');
+    const seccionPasajes = document.getElementById('seccion-pasajes');
+
+    if(accionesRapidas) accionesRapidas.style.display = esNegocio ? 'none' : 'grid';
+    if(seccionPasajes) seccionPasajes.style.display = esNegocio ? 'none' : 'block';
 }
 
 window.cambiarUsuario = (u) => {
@@ -490,24 +632,6 @@ window.accionRapida = async (monto, detalle) => {
     });
 
     await registrarHistorial('gasto', monto, detalle, 'SEMANAL');
-
-};
-
-window.calcPasaje = async (multi) => {
-
-    const bus = parseFloat(document.getElementById('p-bus').value) || 0;
-    const trans = parseFloat(document.getElementById('p-trans').value) || 0;
-
-    const total = (bus + trans) * multi;
-
-    if(total <= 0) return;
-
-    await updateDoc(doc(db, 'usuario', usuarioActivo), {
-        semanal: increment(-total),
-        gastosHoy: increment(total)
-    });
-
-    await registrarHistorial('gasto', total, 'Pasaje', 'SEMANAL');
 
 };
 
@@ -561,49 +685,102 @@ window.guardarManual = async () => {
 
 window.acompaniarMarian = async () => {
 
-    const monto = parseFloat(document.getElementById('monto-acompanar').value);
+    const monto = parseFloat(prompt("¿Cuánto gastaron cada uno?"));
 
     if(!monto || monto <= 0) return;
 
-    await updateDoc(doc(db, 'usuario', 'roger'), {
+    await updateDoc(doc(db, "usuario", "roger"), {
         semanal: increment(-monto),
         gastosHoy: increment(monto)
     });
 
-    await updateDoc(doc(db, 'usuario', 'marian'), {
+    await updateDoc(doc(db, "usuario", "marian"), {
         semanal: increment(-monto),
         gastosHoy: increment(monto)
     });
 
+    await registrarHistorial('gasto', monto, 'Acompañó a Marian', 'SEMANAL');
+
+    alert("Registrado correctamente");
 };
 
-window.registrarPrestamo = async () => {
+window.nuevaDeudaFavor = async () => {
+    const quien = document.getElementById('debe-quien').value;
+    const monto = parseFloat(document.getElementById('debe-cuanto').value);
+    const fecha = document.getElementById('debe-fecha').value;
 
-    const quien = document.getElementById('prestamo-quien').value;
-    const monto = parseFloat(document.getElementById('prestamo-monto').value);
-    const fecha = document.getElementById('prestamo-fecha').value;
-    const tipo = document.getElementById('prestamo-tipo').value;
-    const cuenta = document.getElementById('prestamo-cuenta').value;
-
-    if(!quien || !monto) return;
+    if(!quien || !monto) return alert("Completa los datos");
 
     await addDoc(collection(db, 'prestamos'), {
         usuario: usuarioActivo,
         quien,
         monto,
         fecha,
-        tipo,
-        cuenta,
+        tipo: 'nosdeben',
+        cuenta: 'semanal',
         pagado: false
     });
 
-    // SI NOS PRESTAN DINERO
-    if(tipo === 'debemos') {
-        await updateDoc(doc(db, 'usuario', usuarioActivo), {
-            [cuenta]: increment(monto)
-        });
-    }
+    alert("Préstamo registrado");
+    document.getElementById('debe-quien').value = '';
+    document.getElementById('debe-cuanto').value = '';
+    document.getElementById('debe-fecha').value = '';
+};
 
+window.nuevaDeudaContra = async () => {
+    const quien = document.getElementById('deuda-quien').value;
+    const monto = parseFloat(document.getElementById('deuda-cuanto').value);
+    const fecha = document.getElementById('deuda-fecha').value;
+
+    if(!quien || !monto) return alert("Completa los datos");
+
+    await addDoc(collection(db, 'prestamos'), {
+        usuario: usuarioActivo,
+        quien,
+        monto,
+        fecha,
+        tipo: 'debemos',
+        cuenta: 'semanal',
+        pagado: false
+    });
+
+    await updateDoc(doc(db, 'usuario', usuarioActivo), {
+        semanal: increment(monto)
+    });
+
+    alert("Deuda registrada");
+    document.getElementById('deuda-quien').value = '';
+    document.getElementById('deuda-cuanto').value = '';
+    document.getElementById('deuda-fecha').value = '';
+};
+
+window.borrarHistorialMes = async () => {
+
+    const mes = parseInt(document.getElementById('mes-borrar').value);
+    const anio = parseInt(document.getElementById('anio-borrar').value);
+
+    if(isNaN(anio)) return alert("Ingresa un año");
+
+    const q = await getDocs(collection(db, "movimientos"));
+
+    q.forEach(async (d) => {
+
+        const data = d.data();
+
+        if(!data.fecha) return;
+
+        const fecha = new Date(data.fecha);
+
+        if(
+            fecha.getMonth() === mes &&
+            fecha.getFullYear() === anio
+        ) {
+            await deleteDoc(doc(db, "movimientos", d.id));
+        }
+
+    });
+
+    alert("Historial del mes eliminado");
 };
 
 function renderHistorial() {
@@ -637,7 +814,9 @@ function renderHistorial() {
 
 function renderPrestamos() {
 
-    const lista = document.getElementById('lista-prestamos');
+    const lista = document.getElementById('lista-deudas');
+
+    if(!lista) return;
 
     lista.innerHTML = '';
 
