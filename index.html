@@ -1,769 +1,555 @@
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>DuoFinanzas: Control Total</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>DuoFinanzas: Control Total</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500&family=Plus+Jakarta+Sans:wght@400;700;800&display=swap');
+        
+        body { 
+            font-family: 'Plus Jakarta Sans', sans-serif; 
+            transition: all 0.4s ease;
+            padding-top: 100px;
+            padding-bottom: 110px;
+        }
 
-<script src="https://cdn.tailwindcss.com"></script>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+        .theme-roger { background-color: #e0f2fe; --accent: #3b82f6; --text: #1e40af; }
+        .theme-marian { background-color: #fdf2f8; --accent: #ec4899; --text: #9d174d; }
+        .theme-negocio { background-color: #fef9c3; --accent: #eab308; --text: #854d0e; }
 
-<style>
-@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500&family=Plus+Jakarta+Sans:wght@400;700;800&display=swap');
+        .nav-fixed-top {
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            z-index: 100;
+            background: rgba(255, 255, 255, 0.6);
+            backdrop-filter: blur(15px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+        }
 
-:root {
-    --accent: #3b82f6;
-}
+        .digital-clock {
+            font-family: 'JetBrains Mono', monospace;
+            background: white;
+            color: var(--accent);
+            padding: 5px 12px;
+            border-radius: 12px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+            border: 2px solid var(--accent);
+        }
 
-body {
-    font-family: 'Plus Jakarta Sans', sans-serif;
-    transition: all .3s ease;
-    padding-top: 100px;
-    padding-bottom: 110px;
-}
+        .glass-card { 
+            background: rgba(255, 255, 255, 0.8); 
+            backdrop-filter: blur(10px); 
+            border-radius: 2rem;
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.03);
+        }
 
-.theme-roger {
-    background: #e0f2fe;
-    --accent: #3b82f6;
-}
+        .btn-main { background-color: var(--accent); color: white; }
 
-.theme-marian {
-    background: #fdf2f8;
-    --accent: #ec4899;
-}
+        .view { display: none; }
+        .view.active { display: block; animation: fadeIn 0.3s ease; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-.theme-negocio {
-    background: #fef9c3;
-    --accent: #eab308;
-}
-
-.glass-card {
-    background: rgba(255,255,255,.75);
-    backdrop-filter: blur(10px);
-    border-radius: 2rem;
-    border: 1px solid rgba(255,255,255,.5);
-    box-shadow: 0 8px 20px rgba(0,0,0,.05);
-}
-
-.nav-fixed-top {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    z-index: 100;
-    background: rgba(255,255,255,.6);
-    backdrop-filter: blur(14px);
-    border-bottom: 1px solid rgba(255,255,255,.4);
-}
-
-.digital-clock {
-    font-family: 'JetBrains Mono', monospace;
-    background: white;
-    color: var(--accent);
-    border: 2px solid var(--accent);
-    padding: 5px 12px;
-    border-radius: 12px;
-    font-size: 1rem;
-    font-weight: bold;
-}
-
-.btn-main {
-    background: var(--accent);
-    color: white;
-}
-
-.view {
-    display: none;
-}
-
-.view.active {
-    display: block;
-}
-
-details summary {
-    list-style: none;
-}
-
-details summary::-webkit-details-marker {
-    display: none;
-}
-
-.calc-btn {
-    background: rgba(255,255,255,.6);
-    border-radius: 1rem;
-    padding: 18px;
-    font-weight: bold;
-}
-</style>
+        details summary { list-style: none; outline: none; }
+        details summary::-webkit-details-marker { display: none; }
+        
+        .history-item { border-left: 4px solid; padding: 12px; margin-bottom: 8px; border-radius: 12px; background: rgba(255,255,255,0.6); }
+        .history-item.gasto { border-left-color: #ef4444; }
+        .history-item.ingreso { border-left-color: #10b981; }
+        .history-item.prestamo { border-left-color: #f59e0b; }
+        
+        .calc-history {
+            max-height: 200px;
+            overflow-y: auto;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11px;
+        }
+    </style>
 </head>
 <body class="theme-roger">
 
-<header class="nav-fixed-top p-3 flex justify-between items-center">
-
-    <div>
-        <div id="reloj" class="digital-clock">00:00:00</div>
-        <p id="fecha" class="text-[10px] font-black opacity-50 mt-1"></p>
-    </div>
-
-    <div class="flex gap-2 bg-white/50 p-1 rounded-full shadow-inner border">
-        <button onclick="cambiarUsuario('roger')" class="w-10 h-10 rounded-full bg-blue-500 text-white font-black">R</button>
-        <button onclick="cambiarUsuario('marian')" class="w-10 h-10 rounded-full bg-pink-500 text-white font-black">M</button>
-        <button onclick="cambiarUsuario('negocio')" class="w-10 h-10 rounded-full bg-yellow-500 text-white font-black">N</button>
-    </div>
-
-</header>
-
-<!-- HOME -->
-<main id="view-home" class="view active max-w-md mx-auto p-4 space-y-4">
-
-    <h2 id="titulo-perfil" class="text-center uppercase tracking-widest font-black text-sm opacity-70">
-        Cuentas de Roger
-    </h2>
-
-    <!-- TARJETAS -->
-    <div class="grid grid-cols-2 gap-3">
-
-        <div class="glass-card p-4">
-            <p class="text-[9px] uppercase font-bold opacity-50">Semanal / Caja</p>
-            <h2 id="saldo-semanal" class="text-2xl font-black">Q0.00</h2>
+    <header class="nav-fixed-top p-3 flex justify-between items-center">
+        <div class="flex flex-col">
+            <div id="reloj-digital" class="digital-clock">00:00:00 AM</div>
+            <p id="fecha-actual" class="text-[9px] font-black uppercase mt-1 opacity-60"></p>
         </div>
-
-        <div class="glass-card p-4">
-            <p class="text-[9px] uppercase font-bold opacity-50">Ahorro</p>
-            <h2 id="saldo-ahorro" class="text-2xl font-black text-blue-600">Q0.00</h2>
+        <div class="flex gap-2 bg-white/50 p-1 rounded-full shadow-inner border">
+            <button onclick="cambiarUsuario('roger')" class="w-10 h-10 rounded-full bg-blue-500 text-white font-black border-2 border-white shadow-md">R</button>
+            <button onclick="cambiarUsuario('marian')" class="w-10 h-10 rounded-full bg-pink-500 text-white font-black border-2 border-white shadow-md">M</button>
+            <button onclick="cambiarUsuario('negocio')" class="w-10 h-10 rounded-full bg-yellow-500 text-white font-black border-2 border-white shadow-md">N</button>
         </div>
+    </header>
 
-        <div class="glass-card p-4 col-span-2">
-            <p class="text-[9px] uppercase font-bold opacity-50">Gastos Hoy</p>
-            <h2 id="gastos-hoy" class="text-2xl font-black text-red-500">Q0.00</h2>
-        </div>
-
-    </div>
-
-    <!-- ACCESOS RAPIDOS -->
-    <div class="grid grid-cols-2 gap-3">
-
-        <button onclick="accionRapida(2, 'Pasaje Ida/Vuelta')" class="glass-card p-4 flex flex-col items-center active:scale-95">
-            <span class="text-2xl">🚇</span>
-            <span class="text-[9px] font-black uppercase mt-1">Direct Q2</span>
-        </button>
-
-        <button onclick="accionRapida(5, 'Recarga Tarjeta')" class="glass-card p-4 flex flex-col items-center active:scale-95">
-            <span class="text-2xl">💳</span>
-            <span class="text-[9px] font-black uppercase mt-1">Recarga Q5</span>
-        </button>
-
-    </div>
-
-    <!-- PASAJES -->
-    <div id="seccion-pasajes" class="glass-card p-5">
-
-        <h3 class="font-bold mb-3 flex items-center gap-2">
-            <i class="fa-solid fa-bus"></i> Pasajes Variables
-        </h3>
-
-        <div class="grid grid-cols-2 gap-2 mb-3">
-            <input type="number" id="p-bus" placeholder="Bus Q" class="p-3 rounded-xl bg-white/60 text-sm">
-            <input type="number" id="p-trans" placeholder="Transmetro Q" class="p-3 rounded-xl bg-white/60 text-sm">
-        </div>
-
-        <div class="grid grid-cols-2 gap-2">
-            <button onclick="calcPasaje(1)" class="bg-white/60 py-3 rounded-xl font-black text-xs">IDA O VUELTA</button>
-            <button onclick="calcPasaje(2)" class="bg-black/10 py-3 rounded-xl font-black text-xs">AMBOS</button>
-        </div>
-
-        <!-- ACOMPAÑAR -->
-        <div id="bloque-acompanar" class="mt-3 hidden">
-
-            <div class="flex gap-2 mb-2">
-                <input type="number" id="monto-acompanar" placeholder="Monto Q" class="w-full p-3 rounded-xl bg-white/60 text-sm">
+    <main id="view-home" class="view active max-w-md mx-auto p-4 space-y-4">
+        
+        <h2 id="titulo-perfil" class="text-center font-black uppercase tracking-widest text-sm opacity-70">Cuentas de Roger</h2>
+        
+        <div class="grid grid-cols-2 gap-3">
+            <div class="glass-card p-4">
+                <p class="text-[9px] font-bold opacity-50 uppercase">Semanal / Caja</p>
+                <h2 id="saldo-semanal" class="text-2xl font-black">Q0.00</h2>
             </div>
-
-            <button onclick="acompaniarMarian()" class="w-full bg-indigo-100 text-indigo-700 py-3 rounded-xl font-black text-[10px]">
-                ➕ ACOMPAÑAR A MARIAN
-            </button>
-
+            <div class="glass-card p-4">
+                <p class="text-[9px] font-bold opacity-50 uppercase">Ahorro</p>
+                <h2 id="saldo-ahorro" class="text-2xl font-black text-blue-600">Q0.00</h2>
+            </div>
+            <div class="glass-card p-4">
+                <p class="text-[9px] font-bold opacity-50 uppercase">Emergencia</p>
+                <h2 id="saldo-emergencia" class="text-2xl font-black text-amber-600">Q0.00</h2>
+            </div>
+            <div class="glass-card p-4">
+                <p class="text-[9px] font-bold opacity-50 uppercase">Gastos Hoy</p>
+                <h2 id="gastos-hoy" class="text-2xl font-black text-red-500">Q0.00</h2>
+            </div>
         </div>
 
-    </div>
-
-    <!-- GASTO / INGRESO -->
-    <details class="glass-card overflow-hidden group">
-
-        <summary class="p-5 font-black text-sm flex justify-between items-center cursor-pointer">
-            <span><i class="fa-solid fa-pen-to-square mr-2"></i> Gasto / Ingreso Manual</span>
-            <i class="fa-solid fa-plus text-[10px] transition-transform group-open:rotate-45"></i>
-        </summary>
-
-        <div class="p-5 pt-0 space-y-3">
-
-            <input type="number" id="monto-m" placeholder="Q 0.00" class="w-full text-3xl font-black text-center bg-transparent border-b-2 border-black/10 outline-none pb-2">
-
-            <select id="tipo-m" class="w-full p-3 rounded-2xl bg-white/50 font-bold text-xs">
-                <option value="gasto_semanal">➖ Gasto de Semanal</option>
-                <option value="ingreso_semanal">➕ Ingreso a Semanal</option>
-                <option value="ingreso_ahorro">💰 Ingreso a Ahorro</option>
-                <option value="gasto_ahorro">💸 Gasto de Ahorro</option>
-            </select>
-
-            <input type="text" id="nota-m" placeholder="Detalle del movimiento" class="w-full p-3 rounded-2xl bg-white/50 text-xs outline-none">
-
-            <button onclick="guardarManual()" class="w-full py-4 rounded-2xl font-black shadow-lg btn-main">
-                GUARDAR
+        <!-- Botones de Acceso Rápido -->
+        <div class="grid grid-cols-2 gap-3">
+            <button onclick="accionRapida(2, 'Pasaje Ida/Vuelta')" class="glass-card p-4 flex flex-col items-center active:scale-95">
+                <span class="text-2xl">🚇</span>
+                <span class="text-[9px] font-black uppercase mt-1">Directo Q2</span>
             </button>
-
+            <button onclick="accionRapida(5, 'Recarga Tarjeta')" class="glass-card p-4 flex flex-col items-center active:scale-95">
+                <span class="text-2xl">💳</span>
+                <span class="text-[9px] font-black uppercase mt-1">Recarga Q5</span>
+            </button>
         </div>
 
-    </details>
-
-    <!-- PRESTAMOS -->
-    <div class="glass-card p-5">
-
-        <h3 class="font-bold text-sm mb-4">
-            <i class="fa-solid fa-hand-holding-dollar mr-2"></i>
-            Sistema de Préstamos
-        </h3>
-
-        <div class="space-y-2 mb-4">
-
-            <input type="text" id="prestamo-quien" placeholder="¿Quién?" class="w-full p-3 rounded-xl bg-white/60 text-sm">
-
+        <!-- Sección Pasajes (oculta para negocio) -->
+        <div id="seccion-pasajes" class="glass-card p-5">
+            <h3 class="font-bold mb-3 flex items-center gap-2"><i class="fa-solid fa-bus"></i> Pasajes Variables</h3>
+            <div class="grid grid-cols-2 gap-2 mb-3">
+                <input type="number" id="p-bus" placeholder="Bus Q" class="p-3 rounded-xl border-none bg-white/50 text-sm">
+                <input type="number" id="p-trans" placeholder="Transmetro Q" class="p-3 rounded-xl border-none bg-white/50 text-sm">
+            </div>
             <div class="grid grid-cols-2 gap-2">
-                <input type="number" id="prestamo-monto" placeholder="Monto Q" class="p-3 rounded-xl bg-white/60 text-sm">
-                <input type="date" id="prestamo-fecha" class="p-3 rounded-xl bg-white/60 text-sm">
+                <button onclick="calcPasaje(1)" class="bg-white/50 py-3 rounded-xl font-bold text-xs border border-black/5 active:scale-95">IDA O VUELTA</button>
+                <button onclick="calcPasaje(2)" class="bg-black/5 py-3 rounded-xl font-bold text-xs active:scale-95">AMBOS (X2)</button>
             </div>
-
-            <select id="prestamo-tipo" class="w-full p-3 rounded-xl bg-white/60 text-sm font-bold">
-                <option value="debemos">💸 Nosotros debemos</option>
-                <option value="nosdeben">💰 Nos deben</option>
-            </select>
-
-            <select id="prestamo-cuenta" class="w-full p-3 rounded-xl bg-white/60 text-sm font-bold">
-                <option value="semanal">Usar cuenta semanal</option>
-                <option value="ahorro">Usar cuenta ahorro</option>
-            </select>
-
-            <button onclick="registrarPrestamo()" class="w-full bg-black/10 py-3 rounded-xl font-black text-xs">
-                REGISTRAR PRÉSTAMO
-            </button>
-
+            
+            <!-- Acompañar Marian EDITABLE -->
+            <div id="div-acompaniar" class="mt-3 hidden">
+                <div class="flex gap-2 mb-2">
+                    <input type="number" id="monto-acompanar" placeholder="Monto Q" value="1" class="flex-1 p-3 rounded-xl bg-white/50 text-sm font-bold">
+                    <button onclick="acompaniarMarian()" class="bg-indigo-600 text-white px-4 py-3 rounded-xl font-bold text-xs shadow-md active:scale-95">
+                        <i class="fa-solid fa-user-plus"></i> Aplicar
+                    </button>
+                </div>
+                <p class="text-[9px] text-center opacity-60">Se resta de Roger y Marian</p>
+            </div>
         </div>
 
-        <div>
-            <h4 class="font-black text-[10px] uppercase opacity-50 mb-2">Pendientes</h4>
-            <div id="lista-prestamos" class="space-y-2"></div>
+        <!-- Gasto/Ingreso Manual (MINIMIZABLE, SIN Emergencia) -->
+        <details class="glass-card overflow-hidden group">
+            <summary class="p-5 font-black text-sm flex justify-between items-center cursor-pointer">
+                <span><i class="fa-solid fa-pen-to-square mr-2"></i> Gasto / Ingreso Manual</span>
+                <i class="fa-solid fa-plus text-[10px] transition-transform group-open:rotate-45"></i>
+            </summary>
+            <div class="p-5 pt-0 space-y-3">
+                <input type="number" id="monto-m" placeholder="Q 0.00" class="w-full text-3xl font-black text-center bg-transparent border-b-2 border-black/10 outline-none pb-2">
+                <select id="tipo-m" class="w-full p-3 rounded-2xl bg-white/50 font-bold text-xs">
+                    <option value="gasto_semanal">➖ Gasto de Semanal</option>
+                    <option value="ingreso_semanal">➕ Ingreso a Semanal</option>
+                    <option value="ingreso_ahorro">💰 Meter a Ahorro</option>
+                    <option value="gasto_ahorro">💸 Sacar de Ahorro</option>
+                </select>
+                <input type="text" id="nota-m" placeholder="Detalle del movimiento" class="w-full p-3 rounded-2xl bg-white/50 text-xs outline-none">
+                <button onclick="guardarManual()" class="w-full py-4 rounded-2xl font-black text-white shadow-lg btn-main">GUARDAR</button>
+            </div>
+        </details>
+
+        <!-- Préstamos COMPLETO: Deudas Activas y Pasivas -->
+        <div class="glass-card p-5">
+            <h3 class="font-bold text-sm mb-3"><i class="fa-solid fa-hand-holding-dollar mr-2"></i> Préstamos</h3>
+            
+            <!-- Registrar nuevo préstamo -->
+            <div class="bg-white/30 p-3 rounded-2xl mb-4">
+                <p class="text-[10px] font-bold mb-2 uppercase">Registrar Préstamo</p>
+                <div class="grid grid-cols-2 gap-2 mb-2">
+                    <input type="text" id="prestamo-persona" placeholder="¿Quién?" class="p-2 rounded-xl bg-white/50 text-xs">
+                    <input type="number" id="prestamo-monto" placeholder="Monto Q" class="p-2 rounded-xl bg-white/50 text-xs">
+                </div>
+                <div class="grid grid-cols-2 gap-2 mb-2">
+                    <input type="date" id="prestamo-fecha" class="p-2 rounded-xl bg-white/50 text-xs">
+                    <select id="prestamo-cuenta" class="p-2 rounded-xl bg-white/50 text-xs font-bold">
+                        <option value="semanal">Cuenta: Semanal</option>
+                        <option value="ahorro">Cuenta: Ahorro</option>
+                        <option value="emergencia">Cuenta: Emergencia</option>
+                    </select>
+                </div>
+                <div class="grid grid-cols-2 gap-2">
+                    <button onclick="registrarPrestamoRecibido()" class="bg-green-600 text-white py-2 rounded-xl text-[10px] font-bold active:scale-95">
+                        <i class="fa-solid fa-arrow-down"></i> Recibí (Me deben)
+                    </button>
+                    <button onclick="registrarPrestamoDado()" class="bg-orange-600 text-white py-2 rounded-xl text-[10px] font-bold active:scale-95">
+                        <i class="fa-solid fa-arrow-up"></i> Di (Debo)
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Lista de deudas -->
+            <div id="lista-deudas-recibidas" class="mb-4">
+                <p class="text-[9px] font-bold text-green-700 mb-2"><i class="fa-solid fa-circle-dollar"></i> Me deben</p>
+                <div id="deudas-recibidas" class="space-y-2"></div>
+            </div>
+            <div id="lista-deudas-dadas">
+                <p class="text-[9px] font-bold text-red-700 mb-2"><i class="fa-solid fa-sack-dollar"></i> Debo</p>
+                <div id="deudas-dadas" class="space-y-2"></div>
+            </div>
         </div>
+    </main>
 
-    </div>
-
-</main>
-
-<!-- HISTORIAL -->
-<main id="view-hist" class="view max-w-md mx-auto p-4">
-
-    <h2 class="text-xl font-black mb-4">
-        Historial de <span id="hist-user">Roger</span>
-    </h2>
-
-    <div id="lista-historial" class="space-y-2"></div>
-
-</main>
-
-<!-- CALCULADORA -->
-<main id="view-calc" class="view max-w-md mx-auto p-4 space-y-4">
-
-    <div class="glass-card p-6">
-
-        <div class="bg-white p-6 rounded-3xl text-right mb-4 border border-black/5">
-            <h2 id="calc-res" class="text-4xl font-black" style="color:var(--accent)">0</h2>
+    <!-- Calculadora con HISTORIAL -->
+    <main id="view-calc" class="view max-w-md mx-auto p-4">
+        <div class="glass-card p-6">
+            <div class="bg-white border-2 border-black/5 p-6 rounded-3xl text-right mb-4">
+                <h2 id="calc-res" class="text-4xl font-black" style="color: var(--accent);">0</h2>
+            </div>
+            <div class="grid grid-cols-4 gap-2 mb-4" id="calc-grid"></div>
+            
+            <!-- Historial de cálculos -->
+            <details class="mt-4">
+                <summary class="text-[10px] font-bold uppercase text-center cursor-pointer py-2">📜 Historial de Cálculos</summary>
+                <div id="calc-history-list" class="calc-history mt-2 p-2 bg-white/30 rounded-xl text-[10px]"></div>
+            </details>
         </div>
+    </main>
 
-        <div id="calc-grid" class="grid grid-cols-4 gap-2"></div>
+    <!-- Historial (con fecha y hora) -->
+    <main id="view-hist" class="view max-w-md mx-auto p-4">
+        <h2 class="text-xl font-black mb-4">Movimientos de <span id="hist-nombre">Roger</span></h2>
+        <div id="lista-historial" class="space-y-2"></div>
+    </main>
 
-    </div>
+    <!-- Parche -->
+    <main id="view-patch" class="view max-w-md mx-auto p-4">
+        <div class="glass-card p-6 space-y-6">
+            <h2 class="text-xl font-black text-red-600 uppercase italic">🛠️ Modo Corrección</h2>
+            <div class="space-y-3">
+                <div><label class="text-[9px] font-bold ml-2">SEMANAL</label><input type="number" id="p-sem" class="w-full p-4 rounded-2xl bg-white/50 font-bold border"></div>
+                <div><label class="text-[9px] font-bold ml-2">AHORRO</label><input type="number" id="p-aho" class="w-full p-4 rounded-2xl bg-white/50 font-bold border"></div>
+                <div><label class="text-[9px] font-bold ml-2">EMERGENCIA</label><input type="number" id="p-eme" class="w-full p-4 rounded-2xl bg-white/50 font-bold border"></div>
+                <button onclick="aplicarParche()" class="w-full bg-red-600 text-white py-4 rounded-2xl font-black shadow-lg">SOBRESCRIBIR SALDOS</button>
+            </div>
+        </div>
+    </main>
 
-    <div class="glass-card p-4">
+    <!-- Navegación inferior -->
+    <nav class="fixed bottom-4 left-4 right-4 glass-card p-3 flex justify-around items-center z-50 shadow-2xl">
+        <button onclick="ver('home')" class="flex flex-col items-center text-black/40 hover:text-black"><i class="fa-solid fa-house text-xl"></i><span class="text-[8px] font-bold uppercase">Inicio</span></button>
+        <button onclick="ver('calc')" class="flex flex-col items-center text-black/40 hover:text-black"><i class="fa-solid fa-calculator text-xl"></i><span class="text-[8px] font-bold uppercase">Calc</span></button>
+        <button onclick="ver('hist')" class="flex flex-col items-center text-black/40 hover:text-black"><i class="fa-solid fa-receipt text-xl"></i><span class="text-[8px] font-bold uppercase">Historial</span></button>
+        <button onclick="ver('patch')" class="flex flex-col items-center text-black/40 hover:text-black"><i class="fa-solid fa-wrench text-xl"></i><span class="text-[8px] font-bold uppercase">Parche</span></button>
+    </nav>
 
-        <h3 class="font-black text-sm mb-3">Historial Calculadora</h3>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getFirestore, doc, onSnapshot, updateDoc, increment, setDoc, collection, addDoc, query, orderBy, limit, where, Timestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-        <div id="calc-history" class="space-y-2 text-xs"></div>
+        const firebaseConfig = {
+            apiKey: "AIzaSyBrpGejWy2Xstf_KiqkNSlfknl3HaBhyyE",
+            authDomain: "finanzas-3e70d.firebaseapp.com",
+            projectId: "finanzas-3e70d",
+            storageBucket: "finanzas-3e70d.firebasestorage.app",
+            messagingSenderId: "125350113957",
+            appId: "1:125350113957:web:16e676cc72327bb158934c"
+        };
 
-    </div>
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        
+        let user = 'roger';
+        let localData = {};
 
-</main>
+        // RELOJ 12H
+        setInterval(() => {
+            const n = new Date();
+            document.getElementById('reloj-digital').innerText = n.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true });
+            document.getElementById('fecha-actual').innerText = n.toLocaleDateString('es-GT', { weekday: 'long', day: 'numeric', month: 'short' });
+        }, 1000);
 
-<!-- PARCHE -->
-<main id="view-patch" class="view max-w-md mx-auto p-4">
+        // NAVEGACIÓN
+        window.cambiarUsuario = (u) => {
+            user = u;
+            document.body.className = `theme-${u}`;
+            document.getElementById('titulo-perfil').innerText = `Cuentas de ${u === 'roger' ? 'Roger' : (u === 'marian' ? 'Marian' : 'Negocio')}`;
+            document.getElementById('hist-nombre').innerText = u === 'roger' ? 'Roger' : (u === 'marian' ? 'Marian' : 'Negocio');
+            
+            const seccionPasajes = document.getElementById('seccion-pasajes');
+            const divAcompanar = document.getElementById('div-acompaniar');
+            
+            if (u === 'negocio') {
+                seccionPasajes.style.display = 'none';
+            } else {
+                seccionPasajes.style.display = 'block';
+                divAcompanar.style.display = u === 'roger' ? 'block' : 'none';
+            }
+            
+            render();
+            ver('home');
+        };
 
-    <div class="glass-card p-6 space-y-4">
+        window.ver = (id) => {
+            document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+            document.getElementById('view-'+id).classList.add('active');
+        };
 
-        <h2 class="text-xl font-black text-red-600 uppercase">
-            🛠️ Modo Corrección
-        </h2>
+        // INICIALIZAR usuarios y reset diario
+        ['roger', 'marian', 'negocio'].forEach(u => {
+            onSnapshot(doc(db, "usuario", u), (s) => {
+                if(s.exists()) {
+                    let data = s.data();
+                    // Reset diario de gastosHoy
+                    const hoyStr = new Date().toDateString();
+                    if(data.lastReset !== hoyStr) {
+                        updateDoc(doc(db, "usuario", u), { gastosHoy: 0, lastReset: hoyStr });
+                        data.gastosHoy = 0;
+                    }
+                    localData[u] = data;
+                    if(u === user) render();
+                } else {
+                    setDoc(doc(db, "usuario", u), { semanal: 0, ahorro: 0, emergencia: 0, gastosHoy: 0, lastReset: new Date().toDateString() });
+                }
+            });
+        });
 
-        <input type="number" id="p-sem" placeholder="Semanal" class="w-full p-4 rounded-2xl bg-white/60 border font-bold">
+        function render() {
+            const d = localData[user] || { semanal: 0, ahorro: 0, emergencia: 0, gastosHoy: 0 };
+            document.getElementById('saldo-semanal').innerText = `Q${(d.semanal || 0).toFixed(2)}`;
+            document.getElementById('saldo-ahorro').innerText = `Q${(d.ahorro || 0).toFixed(2)}`;
+            document.getElementById('saldo-emergencia').innerText = `Q${(d.emergencia || 0).toFixed(2)}`;
+            document.getElementById('gastos-hoy').innerText = `Q${(d.gastosHoy || 0).toFixed(2)}`;
+            
+            document.getElementById('p-sem').value = d.semanal;
+            document.getElementById('p-aho').value = d.ahorro;
+            document.getElementById('p-eme').value = d.emergencia;
+            
+            updateHistorial();
+            updatePrestamos();
+        }
 
-        <input type="number" id="p-aho" placeholder="Ahorro" class="w-full p-4 rounded-2xl bg-white/60 border font-bold">
-
-        <button onclick="aplicarParche()" class="w-full bg-red-600 text-white py-4 rounded-2xl font-black">
-            SOBRESCRIBIR SALDOS
-        </button>
-
-    </div>
-
-</main>
-
-<!-- NAV -->
-<nav class="fixed bottom-4 left-4 right-4 glass-card p-3 flex justify-around items-center z-50 shadow-2xl">
-
-    <button onclick="ver('home')" class="flex flex-col items-center text-black/40">
-        <i class="fa-solid fa-house text-xl"></i>
-        <span class="text-[8px] font-bold uppercase">Inicio</span>
-    </button>
-
-    <button onclick="ver('calc')" class="flex flex-col items-center text-black/40">
-        <i class="fa-solid fa-calculator text-xl"></i>
-        <span class="text-[8px] font-bold uppercase">Calc</span>
-    </button>
-
-    <button onclick="ver('hist')" class="flex flex-col items-center text-black/40">
-        <i class="fa-solid fa-clock-rotate-left text-xl"></i>
-        <span class="text-[8px] font-bold uppercase">Historial</span>
-    </button>
-
-    <button onclick="ver('patch')" class="flex flex-col items-center text-black/40">
-        <i class="fa-solid fa-wrench text-xl"></i>
-        <span class="text-[8px] font-bold uppercase">Parche</span>
-    </button>
-
-</nav>
-
-<script type="module">
-
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-
-import {
-    getFirestore,
-    doc,
-    onSnapshot,
-    updateDoc,
-    increment,
-    setDoc,
-    collection,
-    addDoc,
-    query,
-    orderBy,
-    limit
-} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-
-const firebaseConfig = {
-    apiKey: "TU_API_KEY",
-    authDomain: "TU_AUTH_DOMAIN",
-    projectId: "TU_PROJECT_ID",
-    storageBucket: "TU_BUCKET",
-    messagingSenderId: "TU_SENDER_ID",
-    appId: "TU_APP_ID"
-};
-
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
-
-let usuarioActivo = 'roger';
-let datosLocales = {};
-let movimientos = [];
-let prestamos = [];
-
-// RELOJ
-setInterval(() => {
-
-    const n = new Date();
-
-    document.getElementById('reloj').innerText = n.toLocaleTimeString([], {
-        hour: '2-digit',
-        minute: '2-digit',
-        second: '2-digit',
-        hour12: true
-    });
-
-    document.getElementById('fecha').innerText = n.toLocaleDateString('es-GT', {
-        weekday: 'long',
-        day: 'numeric',
-        month: 'short'
-    });
-
-}, 1000);
-
-// USUARIOS
-['roger', 'marian', 'negocio'].forEach(u => {
-
-    onSnapshot(doc(db, 'usuario', u), snap => {
-
-        if(snap.exists()) {
-            datosLocales[u] = snap.data();
-            if(u === usuarioActivo) render();
-        } else {
-            setDoc(doc(db, 'usuario', u), {
-                semanal: 0,
-                ahorro: 0,
-                gastosHoy: 0
+        // FUNCIÓN PARA REGISTRAR EN HISTORIAL
+        async function registrarHistorial(tipo, monto, detalle, cuenta) {
+            await addDoc(collection(db, "movimientos"), {
+                usuario: user,
+                tipo: tipo,
+                monto: monto,
+                cuenta: cuenta,
+                detalle: detalle,
+                fecha: Timestamp.now(),
+                fechaLegible: new Date().toLocaleString('es-GT', { day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit' })
             });
         }
 
-    });
-
-});
-
-// MOVIMIENTOS
-const qMov = query(collection(db, 'movimientos'), orderBy('fechaIso', 'desc'), limit(50));
-
-onSnapshot(qMov, snap => {
-    movimientos = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-    renderHistorial();
-});
-
-// PRESTAMOS
-onSnapshot(collection(db, 'prestamos'), snap => {
-    prestamos = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-    renderPrestamos();
-});
-
-function render() {
-
-    const d = datosLocales[usuarioActivo] || {
-        semanal: 0,
-        ahorro: 0,
-        gastosHoy: 0
-    };
-
-    document.getElementById('saldo-semanal').innerText = `Q${(d.semanal || 0).toFixed(2)}`;
-
-    document.getElementById('saldo-ahorro').innerText = `Q${(d.ahorro || 0).toFixed(2)}`;
-
-    document.getElementById('gastos-hoy').innerText = `Q${(d.gastosHoy || 0).toFixed(2)}`;
-
-    document.getElementById('p-sem').value = d.semanal || 0;
-    document.getElementById('p-aho').value = d.ahorro || 0;
-
-    document.getElementById('titulo-perfil').innerText = `Cuentas de ${usuarioActivo}`;
-
-    document.getElementById('hist-user').innerText = usuarioActivo;
-
-    document.body.className = `theme-${usuarioActivo}`;
-
-    // NEGOCIO SIN PASAJES
-    document.getElementById('seccion-pasajes').style.display = usuarioActivo === 'negocio' ? 'none' : 'block';
-
-    // ACOMPAÑAR SOLO ROGER
-    document.getElementById('bloque-acompanar').style.display = usuarioActivo === 'roger' ? 'block' : 'none';
-
-}
-
-window.cambiarUsuario = (u) => {
-    usuarioActivo = u;
-    render();
-};
-
-window.ver = (id) => {
-    document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
-    document.getElementById(`view-${id}`).classList.add('active');
-};
-
-async function registrarHistorial(tipo, monto, detalle, cuenta) {
-
-    await addDoc(collection(db, 'movimientos'), {
-        usuario: usuarioActivo,
-        tipo,
-        monto,
-        detalle,
-        cuenta,
-        fechaIso: new Date().toISOString(),
-        fechaLegible: new Date().toLocaleString('es-GT')
-    });
-
-}
-
-window.accionRapida = async (monto, detalle) => {
-
-    await updateDoc(doc(db, 'usuario', usuarioActivo), {
-        semanal: increment(-monto),
-        gastosHoy: increment(monto)
-    });
-
-    await registrarHistorial('gasto', monto, detalle, 'SEMANAL');
-
-};
-
-window.calcPasaje = async (multi) => {
-
-    const bus = parseFloat(document.getElementById('p-bus').value) || 0;
-    const trans = parseFloat(document.getElementById('p-trans').value) || 0;
-
-    const total = (bus + trans) * multi;
-
-    if(total <= 0) return;
-
-    await updateDoc(doc(db, 'usuario', usuarioActivo), {
-        semanal: increment(-total),
-        gastosHoy: increment(total)
-    });
-
-    await registrarHistorial('gasto', total, 'Pasaje', 'SEMANAL');
-
-};
-
-window.guardarManual = async () => {
-
-    const monto = parseFloat(document.getElementById('monto-m').value);
-
-    if(!monto || monto <= 0) return;
-
-    const tipo = document.getElementById('tipo-m').value;
-
-    const nota = document.getElementById('nota-m').value || 'Gasto vario';
-
-    let updates = {};
-
-    if(tipo === 'gasto_semanal') {
-        updates = {
-            semanal: increment(-monto),
-            gastosHoy: increment(monto)
+        // ACCIONES RÁPIDAS
+        window.accionRapida = async (monto, detalle) => {
+            await updateDoc(doc(db, "usuario", user), { semanal: increment(-monto), gastosHoy: increment(monto) });
+            await registrarHistorial('gasto', monto, detalle, 'Semanal');
         };
-    }
 
-    else if(tipo === 'ingreso_semanal') {
-        updates = {
-            semanal: increment(monto)
+        // PASAJES
+        window.calcPasaje = async (mult) => {
+            const b = parseFloat(document.getElementById('p-bus').value) || 0;
+            const t = parseFloat(document.getElementById('p-trans').value) || 0;
+            const total = (b + t) * mult;
+            if(total <= 0) return alert("Ingresa un monto válido");
+            await updateDoc(doc(db, "usuario", user), { semanal: increment(-total), gastosHoy: increment(total) });
+            await registrarHistorial('gasto', total, `Pasaje (${mult===1?'Ida':'Ida y Vuelta'})`, 'Semanal');
+            document.getElementById('p-bus').value = "";
+            document.getElementById('p-trans').value = "";
         };
-    }
 
-    else if(tipo === 'ingreso_ahorro') {
-        updates = {
-            ahorro: increment(monto)
+        // ACOMPAÑAR MARIAN (EDITABLE)
+        window.acompaniarMarian = async () => {
+            const monto = parseFloat(document.getElementById('monto-acompanar').value) || 1;
+            if(monto <= 0) return alert("Ingresa un monto válido");
+            
+            await updateDoc(doc(db, "usuario", "roger"), { semanal: increment(-monto), gastosHoy: increment(monto) });
+            await updateDoc(doc(db, "usuario", "marian"), { semanal: increment(-monto), gastosHoy: increment(monto) });
+            
+            await addDoc(collection(db, "movimientos"), { usuario: "roger", tipo: 'gasto', monto: monto, detalle: `Acompañó a Marian`, cuenta: 'Semanal', fecha: Timestamp.now(), fechaLegible: new Date().toLocaleString('es-GT') });
+            await addDoc(collection(db, "movimientos"), { usuario: "marian", tipo: 'gasto', monto: monto, detalle: `Acompañada por Roger`, cuenta: 'Semanal', fecha: Timestamp.now(), fechaLegible: new Date().toLocaleString('es-GT') });
+            
+            alert(`Registrado: -Q${monto} a Roger y -Q${monto} a Marian`);
         };
-    }
 
-    else if(tipo === 'gasto_ahorro') {
-        updates = {
-            ahorro: increment(-monto)
-        };
-    }
-
-    await updateDoc(doc(db, 'usuario', usuarioActivo), updates);
-
-    await registrarHistorial(
-        tipo.includes('gasto') ? 'gasto' : 'ingreso',
-        monto,
-        nota,
-        tipo.split('_')[1].toUpperCase()
-    );
-
-};
-
-window.acompaniarMarian = async () => {
-
-    const monto = parseFloat(document.getElementById('monto-acompanar').value);
-
-    if(!monto || monto <= 0) return;
-
-    await updateDoc(doc(db, 'usuario', 'roger'), {
-        semanal: increment(-monto),
-        gastosHoy: increment(monto)
-    });
-
-    await updateDoc(doc(db, 'usuario', 'marian'), {
-        semanal: increment(-monto),
-        gastosHoy: increment(monto)
-    });
-
-};
-
-window.registrarPrestamo = async () => {
-
-    const quien = document.getElementById('prestamo-quien').value;
-    const monto = parseFloat(document.getElementById('prestamo-monto').value);
-    const fecha = document.getElementById('prestamo-fecha').value;
-    const tipo = document.getElementById('prestamo-tipo').value;
-    const cuenta = document.getElementById('prestamo-cuenta').value;
-
-    if(!quien || !monto) return;
-
-    await addDoc(collection(db, 'prestamos'), {
-        usuario: usuarioActivo,
-        quien,
-        monto,
-        fecha,
-        tipo,
-        cuenta,
-        pagado: false
-    });
-
-    // SI NOS PRESTAN DINERO
-    if(tipo === 'debemos') {
-        await updateDoc(doc(db, 'usuario', usuarioActivo), {
-            [cuenta]: increment(monto)
-        });
-    }
-
-};
-
-function renderHistorial() {
-
-    const lista = document.getElementById('lista-historial');
-
-    lista.innerHTML = '';
-
-    movimientos
-        .filter(m => m.usuario === usuarioActivo)
-        .forEach(m => {
-
-            lista.innerHTML += `
-                <div class="glass-card p-3 flex justify-between items-center border-l-4 ${m.tipo === 'gasto' ? 'border-red-400' : 'border-green-400'}">
-
-                    <div>
-                        <p class="text-[10px] font-black uppercase">${m.detalle}</p>
-                        <p class="text-[8px] opacity-40">${m.fechaLegible}</p>
-                    </div>
-
-                    <p class="font-black text-xs ${m.tipo === 'gasto' ? 'text-red-500' : 'text-green-600'}">
-                        ${m.tipo === 'gasto' ? '-' : '+'}Q${m.monto.toFixed(2)}
-                    </p>
-
-                </div>
-            `;
-
-        });
-
-}
-
-function renderPrestamos() {
-
-    const lista = document.getElementById('lista-prestamos');
-
-    lista.innerHTML = '';
-
-    prestamos
-        .filter(p => p.usuario === usuarioActivo && !p.pagado)
-        .forEach(p => {
-
-            lista.innerHTML += `
-                <div class="bg-white/60 p-3 rounded-xl flex justify-between items-center">
-
-                    <div>
-                        <p class="font-black text-xs">${p.quien}</p>
-                        <p class="text-[9px] opacity-50">${p.fecha}</p>
-                        <p class="text-[9px] font-bold">${p.tipo === 'debemos' ? 'Debemos' : 'Nos deben'}</p>
-                    </div>
-
-                    <div class="text-right">
-                        <p class="font-black text-xs">Q${p.monto}</p>
-                    </div>
-
-                </div>
-            `;
-
-        });
-
-}
-
-window.aplicarParche = async () => {
-
-    const semanal = parseFloat(document.getElementById('p-sem').value) || 0;
-    const ahorro = parseFloat(document.getElementById('p-aho').value) || 0;
-
-    await updateDoc(doc(db, 'usuario', usuarioActivo), {
-        semanal,
-        ahorro
-    });
-
-    alert('Parche aplicado');
-
-};
-
-// CALCULADORA
-const calcGrid = document.getElementById('calc-grid');
-const calcRes = document.getElementById('calc-res');
-const calcHistory = document.getElementById('calc-history');
-
-const keys = [
-    'C','DEL','%','/',
-    '7','8','9','*',
-    '4','5','6','-',
-    '1','2','3','+',
-    '0','.','='
-];
-
-let cur = '';
-let historialCalc = [];
-
-keys.forEach(k => {
-
-    const b = document.createElement('button');
-
-    b.innerText = k;
-    b.className = 'calc-btn';
-
-    if(k === '=') {
-        b.style.background = 'var(--accent)';
-        b.style.color = 'white';
-    }
-
-    b.onclick = () => {
-
-        if(k === 'C') {
-            cur = '';
-        }
-
-        else if(k === 'DEL') {
-            cur = cur.slice(0, -1);
-        }
-
-        else if(k === '=') {
-
-            try {
-
-                const resultado = Function(`return ${cur}`)();
-
-                historialCalc.unshift(`${cur} = ${resultado}`);
-
-                historialCalc = historialCalc.slice(0, 10);
-
-                renderCalcHistory();
-
-                cur = resultado.toString();
-
-            } catch {
-                cur = 'Error';
+        // MANUAL
+        window.guardarManual = async () => {
+            const monto = parseFloat(document.getElementById('monto-m').value);
+            const tipo = document.getElementById('tipo-m').value;
+            const detalle = document.getElementById('nota-m').value || 'Movimiento manual';
+            
+            if(!monto || monto <= 0) return alert("Ingresa un monto válido");
+            
+            let updates = {};
+            let tipoMov = 'gasto';
+            let cuentaNombre = '';
+            
+            if(tipo === 'gasto_semanal') {
+                updates = { semanal: increment(-monto), gastosHoy: increment(monto) };
+                cuentaNombre = 'Semanal';
+            } else if(tipo === 'ingreso_semanal') {
+                updates = { semanal: increment(monto) };
+                cuentaNombre = 'Semanal';
+                tipoMov = 'ingreso';
+            } else if(tipo === 'ingreso_ahorro') {
+                updates = { ahorro: increment(monto) };
+                cuentaNombre = 'Ahorro';
+                tipoMov = 'ingreso';
+            } else if(tipo === 'gasto_ahorro') {
+                updates = { ahorro: increment(-monto) };
+                cuentaNombre = 'Ahorro';
             }
+            
+            await updateDoc(doc(db, "usuario", user), updates);
+            await registrarHistorial(tipoMov, monto, detalle, cuentaNombre);
+            
+            document.getElementById('monto-m').value = "";
+            document.getElementById('nota-m').value = "";
+            alert("✅ Guardado correctamente");
+        };
 
+        // PRÉSTAMOS - Me deben (recibí dinero)
+        window.registrarPrestamoRecibido = async () => {
+            const persona = document.getElementById('prestamo-persona').value;
+            const monto = parseFloat(document.getElementById('prestamo-monto').value);
+            const fecha = document.getElementById('prestamo-fecha').value || new Date().toISOString().split('T')[0];
+            const cuenta = document.getElementById('prestamo-cuenta').value;
+            
+            if(!persona || !monto || monto <= 0) return alert("Completa todos los campos");
+            
+            // Registrar deuda (me deben)
+            await addDoc(collection(db, "prestamos"), {
+                usuario: user,
+                contraparte: persona,
+                monto: monto,
+                tipo: 'recibido', // Me deben a mí
+                cuenta: cuenta,
+                pagado: false,
+                fecha: fecha,
+                fechaRegistro: Timestamp.now()
+            });
+            
+            // Sumar dinero a la cuenta
+            await updateDoc(doc(db, "usuario", user), { [cuenta]: increment(monto) });
+            await registrarHistorial('ingreso', monto, `Préstamo recibido de ${persona}`, cuenta.toUpperCase());
+            
+            limpiarCamposPrestamo();
+            alert(`✅ Préstamo registrado: +Q${monto} a ${cuenta}`);
+        };
+        
+        // PRÉSTAMOS - Debo (di dinero)
+        window.registrarPrestamoDado = async () => {
+            const persona = document.getElementById('prestamo-persona').value;
+            const monto = parseFloat(document.getElementById('prestamo-monto').value);
+            const fecha = document.getElementById('prestamo-fecha').value || new Date().toISOString().split('T')[0];
+            const cuenta = document.getElementById('prestamo-cuenta').value;
+            
+            if(!persona || !monto || monto <= 0) return alert("Completa todos los campos");
+            
+            // Registrar deuda (debo)
+            await addDoc(collection(db, "prestamos"), {
+                usuario: user,
+                contraparte: persona,
+                monto: monto,
+                tipo: 'dado', // Le debo a alguien
+                cuenta: cuenta,
+                pagado: false,
+                fecha: fecha,
+                fechaRegistro: Timestamp.now()
+            });
+            
+            // Restar dinero de la cuenta
+            await updateDoc(doc(db, "usuario", user), { [cuenta]: increment(-monto) });
+            await registrarHistorial('gasto', monto, `Préstamo dado a ${persona}`, cuenta.toUpperCase());
+            
+            limpiarCamposPrestamo();
+            alert(`✅ Préstamo registrado: -Q${monto} de ${cuenta}`);
+        };
+        
+        function limpiarCamposPrestamo() {
+            document.getElementById('prestamo-persona').value = "";
+            document.getElementById('prestamo-monto').value = "";
+            document.getElementById('prestamo-fecha').value = "";
         }
-
-        else {
-            cur += k;
+        
+        // Pagar préstamo (cuando me pagan a mí o yo pago)
+        window.pagarPrestamo = async (id, monto, tipo, cuenta) => {
+            if(!confirm(`¿Marcar como pagado? ${tipo === 'recibido' ? 'Te pagarán Q'+monto : 'Pagarás Q'+monto}`)) return;
+            
+            await updateDoc(doc(db, "prestamos", id), { pagado: true, fechaPago: Timestamp.now() });
+            
+            if(tipo === 'recibido') {
+                // Me pagan, resto de la cuenta (ya no tengo esa deuda a favor)
+                await updateDoc(doc(db, "usuario", user), { [cuenta]: increment(-monto) });
+                await registrarHistorial('gasto', monto, `Me pagaron préstamo`, cuenta.toUpperCase());
+            } else {
+                // Yo pago, sumo a la cuenta (ya no debo)
+                await updateDoc(doc(db, "usuario", user), { [cuenta]: increment(monto) });
+                await registrarHistorial('ingreso', monto, `Pagué préstamo`, cuenta.toUpperCase());
+            }
+            
+            alert("✅ Préstamo marcado como pagado");
+        };
+        
+        function updatePrestamos() {
+            const q = query(collection(db, "prestamos"), where("usuario", "==", user), where("pagado", "==", false));
+            onSnapshot(q, (snap) => {
+                const recibidasDiv = document.getElementById('deudas-recibidas');
+                const dadasDiv = document.getElementById('deudas-dadas');
+                recibidasDiv.innerHTML = "";
+                dadasDiv.innerHTML = "";
+                
+                snap.forEach(docSnap => {
+                    const p = docSnap.data();
+                    const div = document.createElement('div');
+                    div.className = "flex justify-between items-center bg-white/50 p-3 rounded-xl";
+                    div.innerHTML = `
+                        <div>
+                            <p class="text-xs font-black">${p.contraparte}</p>
+                            <p class="text-[9px] opacity-60">${p.fecha} | Q${p.monto}</p>
+                            <p class="text-[8px] opacity-40">Cuenta: ${p.cuenta}</p>
+                        </div>
+                        <button onclick="pagarPrestamo('${docSnap.id}', ${p.monto}, '${p.tipo}', '${p.cuenta}')" 
+                                class="bg-black text-white px-3 py-1 rounded-lg text-[9px] font-bold active:scale-95">
+                            ${p.tipo === 'recibido' ? 'Marcar Pagado' : 'Pagar'}
+                        </button>
+                    `;
+                    
+                    if(p.tipo === 'recibido') {
+                        recibidasDiv.appendChild(div);
+                    } else {
+                        dadasDiv.appendChild(div);
+                    }
+                });
+                
+                if(recibidasDiv.children.length === 0) recibidasDiv.innerHTML = '<p class="text-[10px] opacity-50 text-center">✨ Sin deudas a favor</p>';
+                if(dadasDiv.children.length === 0) dadasDiv.innerHTML = '<p class="text-[10px] opacity-50 text-center">✨ Sin deudas pendientes</p>';
+            });
         }
-
-        calcRes.innerText = cur || '0';
-
-    };
-
-    calcGrid.appendChild(b);
-
-});
-
-function renderCalcHistory() {
-
-    calcHistory.innerHTML = '';
-
-    historialCalc.forEach(h => {
-        calcHistory.innerHTML += `
-            <div class="bg-white/60 rounded-xl p-2 text-xs font-bold">
-                ${h}
-            </div>
-        `;
-    });
-
-}
-
-</script>
-</body>
-</html>
+        
+        // HISTORIAL
+        function updateHistorial() {
+            const q = query(collection(db, "movimientos"), where("usuario", "==", user), orderBy("fecha", "desc"), limit(50));
+            onSnapshot(q, (snap) => {
+                const list = document.getElementById('lista-historial');
+                list.innerHTML = "";
+                
+                snap.forEach(docSnap => {
+                    const h = docSnap.data();
+                    const tipoClass = h.tipo === 'gasto' ? 'gasto' : (h.tipo === 'ingreso' ? 'ingreso' : 'prestamo');
+                    const signo = h.tipo === 'gasto' ? '-' : '+';
+                    
+                    list.innerHTML += `
+                        <div class="history-item ${tipoClass}" style="border-left-color: ${h.tipo === 'gasto' ? '#ef4444' : (h.tipo === 'ingreso' ? '#10b981' : '#f59e0b')}">
+                            <div class="flex justify-between items-start">
+                                <div class="flex-1">
+                                    <p class="text-xs font-black">${h.detalle || 'Movimiento'}</p>
+                                    <p class="text-[9px] opacity-60 mt-1">${h.cuenta || ''}</p>
+                                </div>
+                                <p class="font-black text-sm ${h.tipo === 'gasto' ? 'text-red-500' : 'text-green
