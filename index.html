@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>DuoFinanzas: Mundos de Color</title>
+    <title>DuoFinanzas: Control Total</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
@@ -11,46 +11,50 @@
         
         body { 
             font-family: 'Plus Jakarta Sans', sans-serif; 
-            transition: background-color 0.5s ease, color 0.5s ease;
+            transition: all 0.4s ease;
             padding-top: 100px;
-            padding-bottom: 100px;
+            padding-bottom: 110px;
         }
 
-        /* Mundos de Color (Fondo de toda la página) */
-        .theme-roger { background-color: #e0f2fe; color: #0369a1; } /* Azul Pastel */
-        .theme-marian { background-color: #fdf2f8; color: #9d174d; } /* Rosa Pastel */
-        .theme-negocio { background-color: #fef9c3; color: #854d0e; } /* Amarillo Pastel */
+        /* Mundos de Color */
+        .theme-roger { background-color: #e0f2fe; --accent: #3b82f6; --text: #1e40af; }
+        .theme-marian { background-color: #fdf2f8; --accent: #ec4899; --text: #9d174d; }
+        .theme-negocio { background-color: #fef9c3; --accent: #eab308; --text: #854d0e; }
 
         .nav-fixed-top {
             position: fixed;
             top: 0; left: 0; right: 0;
             z-index: 100;
-            background: rgba(255, 255, 255, 0.4);
+            background: rgba(255, 255, 255, 0.6);
             backdrop-filter: blur(15px);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.3);
         }
 
         .digital-clock {
             font-family: 'JetBrains Mono', monospace;
-            background: #1a202c;
-            color: #4fd1c5;
+            background: white;
+            color: var(--accent);
             padding: 5px 12px;
-            border-radius: 10px;
+            border-radius: 12px;
             font-size: 1.2rem;
-            box-shadow: inset 0 0 10px #000;
+            font-weight: bold;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+            border: 2px solid var(--accent);
         }
 
         .glass-card { 
-            background: rgba(255, 255, 255, 0.7); 
+            background: rgba(255, 255, 255, 0.8); 
             backdrop-filter: blur(10px); 
-            border-radius: 2.5rem;
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            box-shadow: 0 8px 32px rgba(0,0,0,0.05);
+            border-radius: 2rem;
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.03);
         }
 
+        .btn-main { background-color: var(--accent); color: white; }
+
         .view { display: none; }
-        .view.active { display: block; animation: slideUp 0.3s ease-out; }
-        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        .view.active { display: block; animation: fadeIn 0.3s ease; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
         details summary { list-style: none; outline: none; }
         details summary::-webkit-details-marker { display: none; }
@@ -60,122 +64,135 @@
 
     <header class="nav-fixed-top p-3 flex justify-between items-center">
         <div class="flex flex-col">
-            <div id="digital-clock" class="digital-clock">00:00:00 AM</div>
-            <p id="txt-fecha-top" class="text-[9px] font-black uppercase mt-1 opacity-60"></p>
+            <div id="reloj-digital" class="digital-clock">00:00:00 AM</div>
+            <p id="fecha-actual" class="text-[9px] font-black uppercase mt-1 opacity-60"></p>
         </div>
-        <div class="flex gap-2 bg-black/10 p-1 rounded-full">
-            <button onclick="switchUser('roger')" class="w-10 h-10 rounded-full bg-blue-500 text-white font-black border-2 border-white shadow-sm">R</button>
-            <button onclick="switchUser('marian')" class="w-10 h-10 rounded-full bg-pink-500 text-white font-black border-2 border-white shadow-sm">M</button>
-            <button onclick="switchUser('negocio')" class="w-10 h-10 rounded-full bg-yellow-500 text-white font-black border-2 border-white shadow-sm">N</button>
+        <div class="flex gap-2 bg-white/50 p-1 rounded-full shadow-inner border">
+            <button onclick="cambiarUsuario('roger')" class="w-10 h-10 rounded-full bg-blue-500 text-white font-black border-2 border-white shadow-md">R</button>
+            <button onclick="cambiarUsuario('marian')" class="w-10 h-10 rounded-full bg-pink-500 text-white font-black border-2 border-white shadow-md">M</button>
+            <button onclick="cambiarUsuario('negocio')" class="w-10 h-10 rounded-full bg-yellow-500 text-white font-black border-2 border-white shadow-md">N</button>
         </div>
     </header>
 
     <main id="view-home" class="view active max-w-md mx-auto p-4 space-y-4">
         
-        <div class="glass-card p-8 text-center relative overflow-hidden">
-            <h1 id="label-perfil" class="text-[10px] font-black uppercase tracking-[0.2em] mb-2 opacity-50">Roger's World</h1>
-            <p id="val-semanal" class="text-5xl font-black mb-4">Q0.00</p>
-            <div class="flex justify-around items-center border-t border-black/5 pt-4">
-                <div>
-                    <span class="block text-[9px] font-bold opacity-40 uppercase">Ahorro</span>
-                    <span id="val-ahorro" class="font-bold text-lg">Q0.00</span>
-                </div>
-                <div class="h-8 w-px bg-black/10"></div>
-                <div>
-                    <span class="block text-[9px] font-bold opacity-40 uppercase">Gasto Hoy</span>
-                    <span id="val-hoy" class="font-bold text-lg text-red-500">Q0.00</span>
-                </div>
+        <h2 id="titulo-perfil" class="text-center font-black uppercase tracking-widest text-sm opacity-70">Cuentas de Roger</h2>
+        
+        <div class="grid grid-cols-2 gap-3">
+            <div class="glass-card p-4">
+                <p class="text-[9px] font-bold opacity-50 uppercase">Semanal / Caja</p>
+                <h2 id="saldo-semanal" class="text-2xl font-black">Q0.00</h2>
+            </div>
+            <div class="glass-card p-4">
+                <p class="text-[9px] font-bold opacity-50 uppercase">Ahorro</p>
+                <h2 id="saldo-ahorro" class="text-2xl font-black text-blue-600">Q0.00</h2>
+            </div>
+            <div class="glass-card p-4">
+                <p class="text-[9px] font-bold opacity-50 uppercase">Emergencia</p>
+                <h2 id="saldo-emergencia" class="text-2xl font-black text-amber-600">Q0.00</h2>
+            </div>
+            <div class="glass-card p-4">
+                <p class="text-[9px] font-bold opacity-50 uppercase">Gastos Hoy</p>
+                <h2 id="gastos-hoy" class="text-2xl font-black text-red-500">Q0.00</h2>
             </div>
         </div>
 
-        <div class="grid grid-cols-2 gap-3">
-            <button onclick="quickAction(2, 'Viaje Transmetro')" class="glass-card p-5 flex flex-col items-center active:scale-90 transition-transform">
-                <span class="text-3xl">🚇</span>
-                <span class="text-[10px] font-black uppercase mt-1">Viaje Q2</span>
-            </button>
-            <button onclick="quickAction(5, 'Recarga Tarjeta')" class="glass-card p-5 flex flex-col items-center active:scale-90 transition-transform">
-                <span class="text-3xl">💳</span>
-                <span class="text-[10px] font-black uppercase mt-1">Recarga Q5</span>
+        <div id="seccion-pasajes" class="glass-card p-5">
+            <h3 class="font-bold mb-3 flex items-center gap-2"><i class="fa-solid fa-bus"></i> Pasajes Variables</h3>
+            <div class="grid grid-cols-2 gap-2 mb-3">
+                <input type="number" id="p-bus" placeholder="Bus Q" class="p-3 rounded-xl border-none bg-white/50 text-sm">
+                <input type="number" id="p-trans" placeholder="Transmetro Q" class="p-3 rounded-xl border-none bg-white/50 text-sm">
+            </div>
+            <div class="grid grid-cols-2 gap-2">
+                <button onclick="calcPasaje(1)" class="bg-white/50 py-3 rounded-xl font-bold text-xs border border-black/5 active:scale-95">IDA O VUELTA</button>
+                <button onclick="calcPasaje(2)" class="bg-black/5 py-3 rounded-xl font-bold text-xs active:scale-95">AMBOS (X2)</button>
+            </div>
+            <button id="btn-acompaniar" onclick="acompaniarMarian()" class="w-full mt-3 bg-indigo-100 text-indigo-700 py-3 rounded-xl font-bold text-[10px] hidden">
+                ➕ ACOMPAÑAR A MARIAN (-Q1 C/U)
             </button>
         </div>
 
-        <div class="space-y-3">
-            <details class="glass-card overflow-hidden group">
-                <summary class="p-5 font-black text-sm flex justify-between items-center cursor-pointer">
-                    <span><i class="fa-solid fa-file-invoice-dollar mr-2"></i> Movimiento Manual</span>
-                    <i class="fa-solid fa-chevron-down text-xs transition-transform group-open:rotate-180"></i>
-                </summary>
-                <div class="p-5 pt-0 space-y-3 border-t border-black/5 mt-2">
-                    <input type="number" id="in-monto" placeholder="Q 0.00" class="w-full text-3xl font-black text-center bg-transparent border-b-2 border-black/10 outline-none py-2">
-                    <select id="in-tipo" class="w-full p-4 rounded-2xl bg-white/50 font-bold text-sm">
-                        <option value="gasto_semanal">➖ Gasto Semanal</option>
-                        <option value="ingreso_semanal">➕ Ingreso Semanal</option>
-                        <option value="ingreso_ahorro">💰 Ahorrar Dinero</option>
-                        <option value="gasto_ahorro">💸 Usar Ahorro</option>
-                    </select>
-                    <input type="text" id="in-nota" placeholder="¿En qué lo usaste?" class="w-full p-4 rounded-2xl bg-white/50 text-sm outline-none">
-                    <button onclick="execTrans()" class="w-full bg-black text-white py-4 rounded-2xl font-black shadow-lg">GUARDAR</button>
-                </div>
-            </details>
+        <div class="grid grid-cols-2 gap-3">
+            <button onclick="accionRapida(2, 'Pasaje Ida/Vuelta')" class="glass-card p-4 flex flex-col items-center active:scale-95">
+                <span class="text-2xl">🚇</span>
+                <span class="text-[9px] font-black uppercase mt-1">Directo Q2</span>
+            </button>
+            <button onclick="accionRapida(5, 'Recarga Tarjeta')" class="glass-card p-4 flex flex-col items-center active:scale-95">
+                <span class="text-2xl">💳</span>
+                <span class="text-[9px] font-black uppercase mt-1">Recarga Q5</span>
+            </button>
+        </div>
 
-            <details class="glass-card overflow-hidden group">
-                <summary class="p-5 font-black text-sm flex justify-between items-center cursor-pointer">
-                    <span><i class="fa-solid fa-handshake mr-2"></i> Préstamos / Temu</span>
-                    <i class="fa-solid fa-chevron-down text-xs transition-transform group-open:rotate-180"></i>
-                </summary>
-                <div class="p-5 pt-0 space-y-3 border-t border-black/5 mt-2">
-                    <div class="grid grid-cols-2 gap-2">
-                        <input type="text" id="d-nom" placeholder="Nombre" class="p-3 rounded-xl bg-white/50 text-sm">
-                        <input type="number" id="d-mon" placeholder="Monto Q" class="p-3 rounded-xl bg-white/50 text-sm">
-                    </div>
-                    <button onclick="addDeuda()" class="w-full bg-black/10 py-3 rounded-xl font-bold text-xs uppercase">Anotar Deuda</button>
-                    <div id="list-deudas" class="space-y-2 mt-4 text-left"></div>
-                </div>
-            </details>
+        <details class="glass-card overflow-hidden group">
+            <summary class="p-5 font-black text-sm flex justify-between items-center cursor-pointer">
+                <span><i class="fa-solid fa-pen-to-square mr-2"></i> Gasto / Ingreso Manual</span>
+                <i class="fa-solid fa-plus text-[10px] transition-transform group-open:rotate-45"></i>
+            </summary>
+            <div class="p-5 pt-0 space-y-3">
+                <input type="number" id="monto-m" placeholder="Q 0.00" class="w-full text-3xl font-black text-center bg-transparent border-b-2 border-black/10 outline-none pb-2">
+                <select id="tipo-m" class="w-full p-3 rounded-2xl bg-white/50 font-bold text-xs">
+                    <option value="gasto_semanal">➖ Gasto de Semanal</option>
+                    <option value="ingreso_semanal">➕ Ingreso a Semanal</option>
+                    <option value="gasto_emergencia">🚑 Gasto Emergencia</option>
+                    <option value="ingreso_ahorro">💰 Meter a Ahorro</option>
+                </select>
+                <input type="text" id="nota-m" placeholder="Detalle del movimiento" class="w-full p-3 rounded-2xl bg-white/50 text-xs outline-none">
+                <button onclick="guardarManual()" class="w-full py-4 rounded-2xl font-black text-white shadow-lg btn-main">GUARDAR</button>
+            </div>
+        </details>
+
+        <div class="glass-card p-5">
+            <h3 class="font-bold text-sm mb-3"><i class="fa-solid fa-hand-holding-dollar mr-2"></i> Préstamos Pendientes</h3>
+            <div class="flex gap-2 mb-3">
+                <input type="text" id="d-quien" placeholder="¿Quién?" class="w-1/2 p-3 rounded-xl bg-white/50 text-xs">
+                <input type="number" id="d-cuanto" placeholder="Q" class="w-1/2 p-3 rounded-xl bg-white/50 text-xs">
+            </div>
+            <button onclick="nuevaDeuda()" class="w-full bg-black/5 py-2 rounded-xl font-bold text-[10px] uppercase mb-4">Anotar Préstamo</button>
+            <div id="lista-deudas" class="space-y-2"></div>
         </div>
     </main>
 
     <main id="view-calc" class="view max-w-md mx-auto p-4">
-        <div class="glass-card p-6 shadow-2xl">
-            <div class="bg-black/90 p-6 rounded-3xl text-right mb-4">
-                <h2 id="calc-res" class="text-4xl font-black text-teal-400">0</h2>
+        <div class="glass-card p-6">
+            <div class="bg-white border-2 border-black/5 p-6 rounded-3xl text-right mb-4">
+                <h2 id="calc-res" class="text-4xl font-black" style="color: var(--accent);">0</h2>
             </div>
             <div class="grid grid-cols-4 gap-2" id="calc-grid"></div>
         </div>
     </main>
 
     <main id="view-hist" class="view max-w-md mx-auto p-4">
-        <h2 class="text-xl font-black mb-4"><i class="fa-solid fa-clock-rotate-left mr-2"></i> Historial Reciente</h2>
-        <div id="list-historial" class="space-y-3"></div>
+        <h2 class="text-xl font-black mb-4">Movimientos de <span id="hist-nombre">Roger</span></h2>
+        <div id="lista-historial" class="space-y-2"></div>
     </main>
 
     <main id="view-patch" class="view max-w-md mx-auto p-4">
-        <div class="glass-card p-6 border-2 border-red-100">
-            <h2 class="text-xl font-black text-red-600 mb-4 tracking-tighter">🛠️ Modo Parche Manual</h2>
-            <div class="space-y-4">
+        <div class="glass-card p-6 space-y-6">
+            <h2 class="text-xl font-black text-red-600 uppercase italic">🛠️ Modo Corrección</h2>
+            <div class="space-y-3">
                 <div><label class="text-[9px] font-bold ml-2">SEMANAL</label><input type="number" id="p-sem" class="w-full p-4 rounded-2xl bg-white/50 font-bold border"></div>
                 <div><label class="text-[9px] font-bold ml-2">AHORRO</label><input type="number" id="p-aho" class="w-full p-4 rounded-2xl bg-white/50 font-bold border"></div>
-                <div><label class="text-[9px] font-bold ml-2">GASTO HOY</label><input type="number" id="p-hoy" class="w-full p-4 rounded-2xl bg-white/50 font-bold border"></div>
-                <button onclick="savePatch()" class="w-full bg-red-600 text-white py-4 rounded-2xl font-black shadow-lg">SOBRESCRIBIR TODO</button>
+                <div><label class="text-[9px] font-bold ml-2">EMERGENCIA</label><input type="number" id="p-eme" class="w-full p-4 rounded-2xl bg-white/50 font-bold border"></div>
+                <button onclick="aplicarParche()" class="w-full bg-red-600 text-white py-4 rounded-2xl font-black shadow-lg">SOBRESCRIBIR SALDOS</button>
             </div>
             
-            <div class="mt-10 pt-6 border-t border-red-200">
-                <p class="text-[10px] font-bold text-center mb-4">⚠️ ACCIÓN IRREVERSIBLE ⚠️</p>
-                <button onclick="clearAllHistory()" class="w-full bg-white border-2 border-red-500 text-red-500 py-3 rounded-xl font-black text-xs">BORRAR TODAS LAS TRANSACCIONES</button>
+            <div class="pt-6 border-t border-black/5">
+                <p class="text-[10px] font-bold text-center text-gray-400 mb-3 uppercase">Seguridad del Historial</p>
+                <button onclick="limpiarHistorial()" class="w-full bg-white border-2 border-red-500 text-red-500 py-3 rounded-xl font-black text-[10px]">BORRAR TODO EL HISTORIAL</button>
             </div>
         </div>
     </main>
 
-    <nav class="fixed bottom-4 left-4 right-4 glass-card p-3 flex justify-around items-center z-50">
-        <button onclick="showView('home')" class="flex flex-col items-center text-black/40 hover:text-black"><i class="fa-solid fa-house text-xl"></i><span class="text-[8px] font-black uppercase">Home</span></button>
-        <button onclick="showView('calc')" class="flex flex-col items-center text-black/40 hover:text-black"><i class="fa-solid fa-calculator text-xl"></i><span class="text-[8px] font-black uppercase">Calc</span></button>
-        <button onclick="showView('hist')" class="flex flex-col items-center text-black/40 hover:text-black"><i class="fa-solid fa-receipt text-xl"></i><span class="text-[8px] font-black uppercase">Historial</span></button>
-        <button onclick="showView('patch')" class="flex flex-col items-center text-black/40 hover:text-black"><i class="fa-solid fa-wrench text-xl"></i><span class="text-[8px] font-black uppercase">Parche</span></button>
+    <nav class="fixed bottom-4 left-4 right-4 glass-card p-3 flex justify-around items-center z-50 shadow-2xl">
+        <button onclick="ver('home')" class="flex flex-col items-center text-black/40 hover:text-black"><i class="fa-solid fa-house text-xl"></i><span class="text-[8px] font-bold uppercase">Inicio</span></button>
+        <button onclick="ver('calc')" class="flex flex-col items-center text-black/40 hover:text-black"><i class="fa-solid fa-calculator text-xl"></i><span class="text-[8px] font-bold uppercase">Calc</span></button>
+        <button onclick="ver('hist')" class="flex flex-col items-center text-black/40 hover:text-black"><i class="fa-solid fa-receipt text-xl"></i><span class="text-[8px] font-bold uppercase">Historial</span></button>
+        <button onclick="ver('patch')" class="flex flex-col items-center text-black/40 hover:text-black"><i class="fa-solid fa-wrench text-xl"></i><span class="text-[8px] font-bold uppercase">Parche</span></button>
     </nav>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getFirestore, doc, onSnapshot, updateDoc, increment, setDoc, collection, addDoc, query, orderBy, limit, deleteDoc, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { getFirestore, doc, onSnapshot, updateDoc, increment, setDoc, collection, addDoc, query, orderBy, limit, getDocs, deleteDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyBrpGejWy2Xstf_KiqkNSlfknl3HaBhyyE",
@@ -190,24 +207,27 @@
         const db = getFirestore(app);
         
         let user = 'roger';
-        let data = {};
+        let localData = {};
 
-        // RELOJ DIGITAL 12H
+        // RELOJ 12H
         setInterval(() => {
-            const now = new Date();
-            document.getElementById('digital-clock').innerText = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true });
-            document.getElementById('txt-fecha-top').innerText = now.toLocaleDateString('es-GT', { weekday: 'long', day: 'numeric', month: 'short' });
+            const n = new Date();
+            document.getElementById('reloj-digital').innerText = n.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true });
+            document.getElementById('fecha-actual').innerText = n.toLocaleDateString('es-GT', { weekday: 'long', day: 'numeric', month: 'short' });
         }, 1000);
 
-        // NAVEGACIÓN Y USUARIO
-        window.switchUser = (u) => {
+        // NAVEGACIÓN
+        window.cambiarUsuario = (u) => {
             user = u;
             document.body.className = `theme-${u}`;
-            document.getElementById('label-perfil').innerText = u.charAt(0).toUpperCase() + u.slice(1) + "'s World";
-            renderUI();
+            document.getElementById('titulo-perfil').innerText = `Cuentas de ${u}`;
+            document.getElementById('hist-nombre').innerText = u;
+            document.getElementById('btn-acompaniar').style.display = (u === 'roger') ? 'block' : 'none';
+            document.getElementById('seccion-pasajes').style.display = (u === 'negocio') ? 'none' : 'block';
+            render();
         };
 
-        window.showView = (id) => {
+        window.ver = (id) => {
             document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
             document.getElementById('view-'+id).classList.add('active');
         };
@@ -216,76 +236,94 @@
         ['roger', 'marian', 'negocio'].forEach(u => {
             onSnapshot(doc(db, "usuario", u), (s) => {
                 if(s.exists()) {
-                    data[u] = s.data();
-                    if(u === user) renderUI();
+                    localData[u] = s.data();
+                    if(u === user) render();
                 }
             });
         });
 
-        function renderUI() {
-            const d = data[user];
-            if(!d) return;
-            document.getElementById('val-semanal').innerText = `Q${d.semanal.toFixed(2)}`;
-            document.getElementById('val-ahorro').innerText = `Q${d.ahorro.toFixed(2)}`;
-            document.getElementById('val-hoy').innerText = `Q${d.gastosHoy.toFixed(2)}`;
+        function render() {
+            const d = localData[user] || { semanal: 0, ahorro: 0, emergencia: 0, gastosHoy: 0 };
+            document.getElementById('saldo-semanal').innerText = `Q${(d.semanal || 0).toFixed(2)}`;
+            document.getElementById('saldo-ahorro').innerText = `Q${(d.ahorro || 0).toFixed(2)}`;
+            document.getElementById('saldo-emergencia').innerText = `Q${(d.emergencia || 0).toFixed(2)}`;
+            document.getElementById('gastos-hoy').innerText = `Q${(d.gastosHoy || 0).toFixed(2)}`;
             
             document.getElementById('p-sem').value = d.semanal;
             document.getElementById('p-aho').value = d.ahorro;
-            document.getElementById('p-hoy').value = d.gastosHoy;
+            document.getElementById('p-eme').value = d.emergencia;
             
-            fetchHistory();
-            fetchDeudas();
+            updateHistorial();
+            updateDeudas();
         }
 
-        // ACCIONES
-        window.quickAction = async (m, nota) => {
-            await updateDoc(doc(db, "usuario", user), { semanal: increment(-m), gastosHoy: increment(m) });
+        // FUNCIONES CORE
+        async function log(tipo, m, nota, cuenta) {
             await addDoc(collection(db, "movimientos"), {
-                u: user, tipo: 'gasto', m, nota, c: 'SEMANAL', t: new Date().toISOString()
+                u: user, tipo, m, nota, cuenta, fecha: new Date().toISOString(), readable: new Date().toLocaleString('es-GT')
             });
+        }
+
+        window.accionRapida = async (m, nota) => {
+            await updateDoc(doc(db, "usuario", user), { semanal: increment(-m), gastosHoy: increment(m) });
+            await log('gasto', m, nota, 'SEMANAL');
         };
 
-        window.execTrans = async () => {
-            const m = parseFloat(document.getElementById('in-monto').value);
-            const t = document.getElementById('in-tipo').value;
-            const n = document.getElementById('in-nota').value || "Gasto vario";
-            if(!m) return;
+        window.calcPasaje = async (mult) => {
+            const b = parseFloat(document.getElementById('p-bus').value) || 0;
+            const t = parseFloat(document.getElementById('p-trans').value) || 0;
+            const total = (b + t) * mult;
+            if(total <= 0) return;
+            await updateDoc(doc(db, "usuario", user), { semanal: increment(-total), gastosHoy: increment(total) });
+            await log('gasto', total, `Pasaje (${mult===1?'Ida':'Ida/Vuelta'})`, 'SEMANAL');
+            document.getElementById('p-bus').value = ""; document.getElementById('p-trans').value = "";
+        };
 
+        window.acompaniarMarian = async () => {
+            await updateDoc(doc(db, "usuario", "roger"), { semanal: increment(-1), gastosHoy: increment(1) });
+            await updateDoc(doc(db, "usuario", "marian"), { semanal: increment(-1), gastosHoy: increment(1) });
+            await addDoc(collection(db, "movimientos"), { u: "roger", tipo: 'gasto', m: 1, nota: "Acompañó a Marian", cuenta: 'SEMANAL', fecha: new Date().toISOString() });
+            await addDoc(collection(db, "movimientos"), { u: "marian", tipo: 'gasto', m: 1, nota: "Acompañada por Roger", cuenta: 'SEMANAL', fecha: new Date().toISOString() });
+            alert("Registrado: -Q1 a cada uno");
+        };
+
+        window.guardarManual = async () => {
+            const m = parseFloat(document.getElementById('monto-m').value);
+            const t = document.getElementById('tipo-m').value;
+            const n = document.getElementById('nota-m').value || 'Gasto vario';
+            if(!m) return;
             let upd = {};
-            if(t === 'gasto_semanal') upd = { semanal: increment(-m), gastosHoy: increment(m) };
-            if(t === 'ingreso_semanal') upd = { semanal: increment(m) };
-            if(t === 'ingreso_ahorro') upd = { ahorro: increment(m) };
-            if(t === 'gasto_ahorro') upd = { ahorro: increment(-m) };
+            if(t==='gasto_semanal') upd = { semanal: increment(-m), gastosHoy: increment(m) };
+            else if(t==='ingreso_semanal') upd = { semanal: increment(m) };
+            else if(t==='gasto_emergencia') upd = { emergencia: increment(-m) };
+            else if(t==='ingreso_ahorro') upd = { ahorro: increment(m) };
 
             await updateDoc(doc(db, "usuario", user), upd);
-            await addDoc(collection(db, "movimientos"), {
-                u: user, tipo: t.includes('gasto')?'gasto':'ingreso', m, nota: n, c: t.includes('semanal')?'SEMANAL':'AHORRO', t: new Date().toISOString()
-            });
-            document.getElementById('in-monto').value = ""; document.getElementById('in-nota').value = "";
+            await log(t.includes('gasto')?'gasto':'ingreso', m, n, t.split('_')[1].toUpperCase());
+            document.getElementById('monto-m').value = ""; document.getElementById('nota-m').value = "";
         };
 
-        window.addDeuda = async () => {
-            const n = document.getElementById('d-nom').value;
-            const m = parseFloat(document.getElementById('d-mon').value);
-            if(!n || !m) return;
-            await addDoc(collection(db, "prestamos"), { 
-                u: user, nom: n, m, pagado: false, t: new Date().toLocaleDateString() 
-            });
-            document.getElementById('d-nom').value = ""; document.getElementById('d-mon').value = "";
+        // DEUDAS
+        window.nuevaDeuda = async () => {
+            const q = document.getElementById('d-quien').value;
+            const c = parseFloat(document.getElementById('d-cuanto').value);
+            if(!q || !c) return;
+            await addDoc(collection(db, "prestamos"), { u: user, de: q, m: c, p: false, f: new Date().toLocaleDateString() });
+            document.getElementById('d-quien').value = ""; document.getElementById('d-cuanto').value = "";
         };
 
-        function fetchDeudas() {
+        function updateDeudas() {
             onSnapshot(collection(db, "prestamos"), (s) => {
-                const l = document.getElementById('list-deudas'); l.innerHTML = "";
+                const list = document.getElementById('lista-deudas'); list.innerHTML = "";
                 s.docs.forEach(docSnap => {
                     const d = docSnap.data();
-                    if(d.u === user && !d.pagado) {
-                        l.innerHTML += `
-                            <div class="bg-white/40 p-3 rounded-2xl flex justify-between items-center shadow-sm border border-white/50">
-                                <div><p class="text-xs font-black">${d.nom}</p><p class="text-[9px] opacity-40">${d.t}</p></div>
-                                <div class="flex items-center gap-2">
-                                    <span class="font-bold text-sm">Q${d.m}</span>
-                                    <button onclick="payDeuda('${docSnap.id}', ${d.m})" class="bg-black text-white text-[9px] px-3 py-2 rounded-lg font-black">SALDAR</button>
+                    if(d.u === user && !d.p) {
+                        list.innerHTML += `
+                            <div class="flex justify-between items-center bg-white/50 p-3 rounded-xl border border-black/5">
+                                <div><p class="text-[10px] font-black">${d.de}</p><p class="text-[8px] opacity-40">${d.f}</p></div>
+                                <div class="flex items-center gap-3">
+                                    <span class="font-bold text-xs">Q${d.m}</span>
+                                    <button onclick="saldarDeuda('${docSnap.id}', ${d.m})" class="bg-black text-white text-[8px] px-3 py-2 rounded-lg font-black uppercase">Saldar</button>
                                 </div>
                             </div>`;
                     }
@@ -293,61 +331,59 @@
             });
         }
 
-        window.payDeuda = async (id, m) => {
-            if(!confirm("¿Saldar deuda de Q"+m+"? Se restará de tu semanal.")) return;
-            await updateDoc(doc(db, "prestamos", id), { pagado: true });
+        window.saldarDeuda = async (id, m) => {
+            if(!confirm(`¿Pagar Q${m}? Se restará de tu semanal.`)) return;
+            await updateDoc(doc(db, "prestamos", id), { p: true });
             await updateDoc(doc(db, "usuario", user), { semanal: increment(-m), gastosHoy: increment(m) });
-            await addDoc(collection(db, "movimientos"), { 
-                u: user, tipo: 'gasto', m, nota: "Deuda saldada", c: 'SEMANAL', t: new Date().toISOString() 
-            });
+            await log('gasto', m, 'Deuda Pagada', 'SEMANAL');
         };
 
-        function fetchHistory() {
-            const q = query(collection(db, "movimientos"), orderBy("t", "desc"), limit(20));
+        // HISTORIAL
+        function updateHistorial() {
+            const q = query(collection(db, "movimientos"), orderBy("fecha", "desc"), limit(25));
             onSnapshot(q, (s) => {
-                const l = document.getElementById('list-historial'); l.innerHTML = "";
+                const list = document.getElementById('lista-historial'); list.innerHTML = "";
                 s.docs.forEach(docSnap => {
                     const h = docSnap.data();
                     if(h.u !== user) return;
-                    l.innerHTML += `
-                        <div class="glass-card p-4 flex justify-between items-center shadow-sm border-l-4 ${h.tipo==='gasto'?'border-red-400':'border-green-400'}">
-                            <div><p class="text-xs font-black uppercase tracking-tighter">${h.nota}</p><p class="text-[9px] opacity-30">${new Date(h.t).toLocaleString()}</p></div>
-                            <p class="font-black ${h.tipo==='gasto'?'text-red-500':'text-green-600'}">${h.tipo==='gasto'?'-':'+'} Q${h.m.toFixed(2)}</p>
+                    list.innerHTML += `
+                        <div class="glass-card p-3 flex justify-between items-center border-l-4 ${h.tipo==='gasto'?'border-red-400':'border-green-400'}">
+                            <div><p class="text-[10px] font-black uppercase">${h.nota}</p><p class="text-[8px] opacity-30">${h.readable || ''}</p></div>
+                            <p class="font-black text-xs ${h.tipo==='gasto'?'text-red-500':'text-green-600'}">${h.tipo==='gasto'?'-':'+'} Q${h.m.toFixed(2)}</p>
                         </div>`;
                 });
             });
         }
 
-        window.savePatch = async () => {
+        // PARCHE
+        window.aplicarParche = async () => {
             const s = parseFloat(document.getElementById('p-sem').value);
             const a = parseFloat(document.getElementById('p-aho').value);
-            const h = parseFloat(document.getElementById('p-hoy').value);
-            await updateDoc(doc(db, "usuario", user), { semanal: s, ahorro: a, gastosHoy: h });
-            alert("Sistema sincronizado ✅");
+            const e = parseFloat(document.getElementById('p-eme').value);
+            await updateDoc(doc(db, "usuario", user), { semanal: s, ahorro: a, emergencia: e });
+            alert("Saldos actualizados ✅");
         };
 
-        window.clearAllHistory = async () => {
-            if(!confirm("¿Estás SEGURO? Se borrará todo el historial de transacciones.")) return;
-            const q = query(collection(db, "movimientos"));
-            const s = await getDocs(q);
-            s.forEach(async (d) => await deleteDoc(doc(db, "movimientos", d.id)));
-            alert("Historial borrado.");
+        window.limpiarHistorial = async () => {
+            if(!confirm("¿Borrar historial? Esto no afecta tus saldos.")) return;
+            const q = await getDocs(collection(db, "movimientos"));
+            q.forEach(async (d) => await deleteDoc(doc(db, "movimientos", d.id)));
+            alert("Historial limpio.");
         };
 
-        // CALCULADORA
+        // CALCULADORA ARMÓNICA
         const cGrid = document.getElementById('calc-grid');
         const keys = ["C", "DEL", "%", "/", "7", "8", "9", "*", "4", "5", "6", "-", "1", "2", "3", "+", "0", ".", "="];
         let cur = "";
         keys.forEach(k => {
             const b = document.createElement('button');
             b.innerText = k;
-            b.className = "p-5 bg-white/50 rounded-2xl font-bold text-lg active:bg-white";
-            if(k === "=") b.className = "p-5 bg-teal-400 text-black rounded-2xl font-black text-xl col-span-1";
-            if(k === "C") b.className += " text-red-500";
+            b.className = "p-5 bg-white/50 rounded-2xl font-bold text-lg active:scale-90 transition-all";
+            if(k === "=") b.style.backgroundColor = "var(--accent)", b.style.color = "white";
             b.onclick = () => {
                 if(k === "C") cur = "";
                 else if(k === "DEL") cur = cur.slice(0, -1);
-                else if(k === "=") { try { cur = eval(cur).toString(); } catch { cur = "Err"; } }
+                else if(k === "=") { try { cur = eval(cur).toString(); } catch { cur = "Error"; } }
                 else cur += k;
                 document.getElementById('calc-res').innerText = cur || "0";
             };
