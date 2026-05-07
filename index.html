@@ -3,125 +3,109 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>DuoFinanzas: Edición Ingeniería</title>
+    <title>DuoFinanzas Pro: Digital Edition</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        :root { --p-blue: #dbeafe; --p-pink: #fce7f3; --p-green: #d1fae5; --p-orange: #ffedd5; }
-        body { background-color: #fffaf5; font-family: 'Inter', sans-serif; padding-bottom: 100px; color: #444; }
+        /* Paleta de Colores Inmersiva */
+        body.theme-roger { background-color: #e0f2fe; --accent-color: #3b82f6; }
+        body.theme-marian { background-color: #fce7f3; --accent-color: #ec4899; }
+        body.theme-negocio { background-color: #d1fae5; --accent-color: #10b981; }
+
+        body { transition: background-color 0.5s ease; font-family: 'Inter', sans-serif; padding-bottom: 100px; }
         
-        .theme-roger { --accent: #60a5fa; --bg-card: var(--p-blue); }
-        .theme-marian { --accent: #f472b6; --bg-card: var(--p-pink); }
-        .theme-negocio { --accent: #34d399; --bg-card: var(--p-green); }
-
         .view { display: none; }
-        .view.active { display: block; animation: slideUp 0.3s ease-out; }
-        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        .view.active { display: block; animation: fadeIn 0.3s ease; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-        .quick-btn { transition: all 0.2s; border: 1px solid rgba(0,0,0,0.05); }
-        .quick-btn:active { transform: scale(0.92); filter: brightness(0.9); }
-
-        /* Reloj Minimalista */
-        .analog-clock { width: 60px; height: 60px; border: 2px solid #555; border-radius: 50%; position: relative; background: white; }
-        .hand { position: absolute; bottom: 50%; left: 50%; transform-origin: bottom; background: #333; border-radius: 4px; }
-        .h-hour { width: 3px; height: 15px; }
-        .h-min { width: 2px; height: 22px; }
-        .h-sec { width: 1px; height: 25px; background: #ff4d4d; }
+        .glass-card { background: rgba(255, 255, 255, 0.6); backdrop-filter: blur(10px); border-radius: 2rem; border: 1px solid rgba(255,255,255,0.4); }
+        .digital-clock { font-family: 'Courier New', Courier, monospace; letter-spacing: -1px; }
+        
+        .btn-quick { transition: transform 0.1s; border: 1px solid rgba(0,0,0,0.05); background: white; }
+        .btn-quick:active { transform: scale(0.95); background: #f9fafb; }
+        
+        summary { list-style: none; }
+        summary::-webkit-details-marker { display: none; }
     </style>
 </head>
 <body class="theme-roger">
 
-    <header class="bg-white/80 backdrop-blur-md sticky top-0 z-50 p-4 border-b flex justify-between items-center">
-        <div class="flex items-center gap-3">
-            <div class="analog-clock shadow-inner">
-                <div id="h-hour" class="hand h-hour"></div>
-                <div id="h-min" class="hand h-min"></div>
-                <div id="h-sec" class="hand h-sec"></div>
-                <div class="absolute top-1/2 left-1/2 w-2 h-2 bg-black rounded-full -translate-x-1/2 -translate-y-1/2"></div>
-            </div>
-            <div>
-                <p id="txt-fecha" class="text-[10px] font-black opacity-40 uppercase"></p>
-                <h1 id="txt-usuario" class="text-xl font-black text-gray-800 leading-none">Roger</h1>
-            </div>
+    <header class="p-6 flex flex-col items-center gap-4">
+        <div class="text-center">
+            <div id="clock" class="digital-clock text-4xl font-black text-gray-800 drop-shadow-sm">00:00:00</div>
+            <div id="date" class="text-[10px] font-bold text-gray-500 uppercase tracking-[0.2em] mt-1">CARGANDO...</div>
         </div>
-        <div class="flex gap-2">
-            <button onclick="switchUser('roger')" class="w-10 h-10 rounded-full bg-blue-100 border-2 border-blue-400 text-blue-600 font-bold">R</button>
-            <button onclick="switchUser('marian')" class="w-10 h-10 rounded-full bg-pink-100 border-2 border-pink-400 text-pink-600 font-bold">M</button>
-            <button onclick="switchUser('negocio')" class="w-10 h-10 rounded-full bg-emerald-100 border-2 border-emerald-400 text-emerald-600 font-bold">N</button>
+
+        <div class="flex gap-4 bg-white/40 p-2 rounded-full border border-white/50">
+            <button onclick="switchUser('roger')" class="w-12 h-12 rounded-full bg-blue-500 text-white font-black shadow-lg shadow-blue-200 flex items-center justify-center">R</button>
+            <button onclick="switchUser('marian')" class="w-12 h-12 rounded-full bg-pink-500 text-white font-black shadow-lg shadow-pink-200 flex items-center justify-center">M</button>
+            <button onclick="switchUser('negocio')" class="w-12 h-12 rounded-full bg-emerald-500 text-white font-black shadow-lg shadow-emerald-200 flex items-center justify-center">N</button>
         </div>
+        <h1 id="txt-usuario" class="text-xs font-black uppercase text-gray-400 tracking-widest">Perfil: Roger</h1>
     </header>
 
-    <main id="view-home" class="view active max-w-md mx-auto p-4 space-y-4">
+    <main id="view-home" class="view active max-w-md mx-auto p-4 space-y-6">
         
-        <div class="bg-white rounded-[2.5rem] p-6 shadow-sm border border-gray-100 text-center relative overflow-hidden">
-            <div class="relative z-10">
-                <p class="text-[10px] font-bold text-gray-400 uppercase tracking-tighter">Disponible para Gastar</p>
-                <h2 id="val-semanal" class="text-5xl font-black text-gray-800 my-1">Q0.00</h2>
-                <div class="flex justify-around mt-4 pt-4 border-t border-dashed">
-                    <div>
-                        <p class="text-[9px] font-bold text-gray-400">AHORRO</p>
-                        <p id="val-ahorro" class="font-bold text-blue-600">Q0.00</p>
-                    </div>
-                    <div>
-                        <p class="text-[9px] font-bold text-gray-400">GASTO HOY</p>
-                        <p id="val-hoy" class="font-bold text-red-500">Q0.00</p>
-                    </div>
+        <div class="glass-card p-8 shadow-xl text-center">
+            <p class="text-[10px] font-black text-gray-400 uppercase mb-1">Disponible Semanal</p>
+            <h2 id="val-semanal" class="text-5xl font-black text-gray-800">Q0.00</h2>
+            <div class="flex justify-between mt-8 border-t border-gray-200/50 pt-4">
+                <div>
+                    <p class="text-[9px] font-bold text-gray-400 uppercase">Ahorro</p>
+                    <p id="val-ahorro" class="font-black text-gray-700">Q0.00</p>
+                </div>
+                <div>
+                    <p class="text-[9px] font-bold text-gray-400 uppercase">Gastos Hoy</p>
+                    <p id="val-hoy" class="font-black text-red-500">Q0.00</p>
                 </div>
             </div>
         </div>
 
-        <section class="space-y-2">
-            <h3 class="text-xs font-black text-gray-400 uppercase px-2">Acciones Rápidas ⚡</h3>
-            <div class="grid grid-cols-2 gap-2">
-                <button onclick="quickAdd(2, 'Transmetro')" class="quick-btn bg-white p-4 rounded-2xl flex items-center gap-3 shadow-sm">
-                    <span class="text-2xl">🚇</span>
-                    <div class="text-left"><p class="text-xs font-bold">Transmetro</p><p class="text-[10px] opacity-50">Q2.00</p></div>
-                </button>
-                <button onclick="quickAdd(7, 'Bus Diario')" id="btn-bus-r" class="quick-btn bg-white p-4 rounded-2xl flex items-center gap-3 shadow-sm">
-                    <span class="text-2xl">🚌</span>
-                    <div class="text-left"><p class="text-xs font-bold">Bus</p><p class="text-[10px] opacity-50">Q7.00</p></div>
-                </button>
-                <button onclick="quickAdd(15, 'Almuerzo U')" class="quick-btn bg-white p-4 rounded-2xl flex items-center gap-3 shadow-sm border-l-4 border-orange-300">
-                    <span class="text-2xl">🍱</span>
-                    <div class="text-left"><p class="text-xs font-bold">Almuerzo</p><p class="text-[10px] opacity-50">Q15.00</p></div>
-                </button>
-                <button onclick="quickAdd(5, 'Risitos/Snack')" class="quick-btn bg-white p-4 rounded-2xl flex items-center gap-3 shadow-sm">
-                    <span class="text-2xl">🍿</span>
-                    <div class="text-left"><p class="text-xs font-bold">Antojo</p><p class="text-[10px] opacity-50">Q5.00</p></div>
-                </button>
-            </div>
-        </section>
+        <div class="grid grid-cols-2 gap-3">
+            <button onclick="quickAdd(2, 'Viaje Transmetro')" class="btn-quick p-4 rounded-2xl flex flex-col items-center shadow-sm">
+                <span class="text-2xl mb-1">🚇</span>
+                <span class="text-[10px] font-black text-gray-500 uppercase">Viaje Q2</span>
+            </button>
+            <button onclick="quickAdd(5, 'Recarga Tarjeta')" class="btn-quick p-4 rounded-2xl flex flex-col items-center shadow-sm">
+                <span class="text-2xl mb-1">💳</span>
+                <span class="text-[10px] font-black text-gray-500 uppercase">Recarga Q5</span>
+            </button>
+            <button id="btn-bus-roger" onclick="quickAdd(7, 'Bus Diario')" class="btn-quick p-4 rounded-2xl flex flex-col items-center shadow-sm col-span-2">
+                <span class="text-2xl mb-1">🚌</span>
+                <span class="text-[10px] font-black text-gray-500 uppercase">Gasto Bus (Q7)</span>
+            </button>
+        </div>
 
         <div class="space-y-3">
-            <details class="bg-white rounded-2xl shadow-sm overflow-hidden group border border-transparent open:border-gray-200">
-                <summary class="p-4 font-black text-sm flex justify-between items-center cursor-pointer list-none">
-                    <span><i class="fa-solid fa-file-invoice-dollar mr-2 text-blue-400"></i> Registrar Personalizado</span>
-                    <i class="fa-solid fa-chevron-down text-[10px] transition-transform group-open:rotate-180"></i>
+            <details class="glass-card group overflow-hidden">
+                <summary class="p-4 font-black text-sm flex justify-between items-center cursor-pointer">
+                    <span>✨ OTROS MOVIMIENTOS</span>
+                    <i class="fa-solid fa-plus text-[10px] transition-transform group-open:rotate-45"></i>
                 </summary>
-                <div class="p-4 pt-0 space-y-3 border-t border-gray-50">
-                    <input type="number" id="in-monto" placeholder="Q 0.00" class="w-full text-3xl font-black text-center py-2 outline-none border-b">
-                    <select id="in-tipo" class="w-full p-3 bg-gray-50 rounded-xl font-bold text-sm">
-                        <option value="gasto_semanal">➖ Gasto de Semanal</option>
-                        <option value="ingreso_semanal">➕ Ingreso a Semanal</option>
-                        <option value="ingreso_ahorro">💰 Meter a Ahorro</option>
+                <div class="p-4 pt-0 space-y-4">
+                    <input type="number" id="in-monto" placeholder="Q 0.00" class="w-full text-3xl font-black text-center bg-transparent border-b-2 border-gray-300 outline-none">
+                    <select id="in-tipo" class="w-full p-3 rounded-xl bg-white/50 font-bold text-xs uppercase">
+                        <option value="gasto_semanal">➖ Quitar de Semanal</option>
+                        <option value="ingreso_semanal">➕ Meter a Semanal</option>
+                        <option value="ingreso_ahorro">💰 Ahorrar Dinero</option>
                         <option value="gasto_ahorro">💸 Sacar de Ahorro</option>
                     </select>
-                    <input type="text" id="in-nota" placeholder="¿En qué se usó?" class="w-full p-3 bg-gray-50 rounded-xl text-sm outline-none">
-                    <button onclick="execTrans()" class="w-full bg-gray-800 text-white py-4 rounded-xl font-bold active:scale-95 transition-all">Guardar Movimiento</button>
+                    <input type="text" id="in-nota" placeholder="¿Qué compraste?" class="w-full p-3 rounded-xl bg-white/50 text-sm outline-none">
+                    <button onclick="execTrans()" class="w-full bg-gray-800 text-white py-4 rounded-xl font-bold shadow-lg">GUARDAR</button>
                 </div>
             </details>
 
-            <details class="bg-white rounded-2xl shadow-sm overflow-hidden group border border-transparent open:border-gray-200">
-                <summary class="p-4 font-black text-sm flex justify-between items-center cursor-pointer list-none">
-                    <span><i class="fa-solid fa-users-between-lines mr-2 text-orange-400"></i> Deudas / Temu / Familia</span>
-                    <i class="fa-solid fa-chevron-down text-[10px] transition-transform group-open:rotate-180"></i>
+            <details class="glass-card group overflow-hidden">
+                <summary class="p-4 font-black text-sm flex justify-between items-center cursor-pointer">
+                    <span>🤝 DEUDAS Y PRESTAMOS</span>
+                    <i class="fa-solid fa-hand-holding-dollar text-[10px]"></i>
                 </summary>
-                <div class="p-4 pt-0 space-y-3 border-t border-gray-50">
-                    <div class="grid grid-cols-2 gap-2">
-                        <input type="text" id="d-nombre" placeholder="Nombre" class="p-3 bg-gray-50 rounded-xl text-sm">
-                        <input type="number" id="d-monto" placeholder="Monto Q" class="p-3 bg-gray-50 rounded-xl text-sm">
+                <div class="p-4 pt-0 space-y-3">
+                    <div class="flex gap-2">
+                        <input type="text" id="d-nom" placeholder="Nombre" class="w-2/3 p-3 rounded-xl bg-white/50 text-sm">
+                        <input type="number" id="d-mon" placeholder="Q" class="w-1/3 p-3 rounded-xl bg-white/50 text-sm">
                     </div>
-                    <button onclick="addDeuda()" class="w-full bg-orange-100 text-orange-700 py-3 rounded-xl font-bold text-sm">Anotar Deuda</button>
+                    <button onclick="addDeuda()" class="w-full bg-white text-gray-800 py-3 rounded-xl font-black text-xs border border-gray-200">ANOTAR EN LISTA</button>
                     <div id="list-deudas" class="space-y-2 mt-4"></div>
                 </div>
             </details>
@@ -129,54 +113,51 @@
     </main>
 
     <main id="view-calc" class="view max-w-md mx-auto p-4">
-        <div class="bg-white rounded-[2.5rem] p-6 shadow-sm">
-            <div class="bg-gray-50 p-6 rounded-2xl text-right mb-4">
-                <h2 id="calc-res" class="text-4xl font-black text-gray-800">0</h2>
+        <div class="glass-card p-6 shadow-xl">
+            <div class="bg-black/5 p-6 rounded-2xl text-right mb-4">
+                <div id="calc-res" class="text-4xl font-black text-gray-800 digital-clock">0</div>
             </div>
-            <div class="grid grid-cols-4 gap-2" id="calc-btns">
-                </div>
+            <div class="grid grid-cols-4 gap-2" id="calc-grid"></div>
         </div>
     </main>
 
     <main id="view-hist" class="view max-w-md mx-auto p-4">
-        <div class="flex justify-between items-end mb-6">
-            <h2 class="text-2xl font-black">Historial</h2>
-            <button onclick="limpiarHistorialTodo()" class="text-[10px] font-bold text-red-400">LIMPIAR TODO</button>
-        </div>
+        <h2 class="text-2xl font-black text-gray-800 mb-6 flex justify-between items-center">
+            Historial <button onclick="clearHist()" class="text-[9px] bg-red-100 text-red-500 px-2 py-1 rounded">BORRAR</button>
+        </h2>
         <div id="list-historial" class="space-y-3"></div>
     </main>
 
     <main id="view-patch" class="view max-w-md mx-auto p-4">
-        <div class="bg-white rounded-[2.5rem] p-6 border-2 border-red-50">
-            <h2 class="text-xl font-black text-red-500 mb-2 italic">🛠️ Modo Edición Total</h2>
-            <p class="text-[10px] text-gray-400 mb-6 font-bold uppercase">Usa esto para corregir errores sin generar historial.</p>
+        <div class="glass-card p-6 border-2 border-red-200">
+            <h2 class="text-xl font-black text-red-600 mb-4 italic">Corregir Base de Datos</h2>
             <div class="space-y-4">
-                <div><label class="text-[10px] font-bold ml-2">SALDO SEMANAL</label><input type="number" id="p-sem" class="w-full p-4 bg-gray-50 rounded-2xl font-bold text-xl"></div>
-                <div><label class="text-[10px] font-bold ml-2">AHORRO TOTAL</label><input type="number" id="p-aho" class="w-full p-4 bg-gray-50 rounded-2xl font-bold text-xl"></div>
-                <div><label class="text-[10px] font-bold ml-2">GASTO DE HOY</label><input type="number" id="p-hoy" class="w-full p-4 bg-gray-50 rounded-2xl font-bold text-xl"></div>
-                <button onclick="savePatch()" class="w-full bg-red-500 text-white py-5 rounded-2xl font-black shadow-lg shadow-red-100">SOBRESCRIBIR SISTEMA</button>
+                <div><label class="text-[9px] font-black text-gray-400 ml-1">NUEVO SEMANAL</label><input type="number" id="p-sem" class="w-full p-4 rounded-2xl bg-white/50 font-black text-xl"></div>
+                <div><label class="text-[9px] font-black text-gray-400 ml-1">NUEVO AHORRO</label><input type="number" id="p-aho" class="w-full p-4 rounded-2xl bg-white/50 font-black text-xl"></div>
+                <div><label class="text-[9px] font-black text-gray-400 ml-1">NUEVO GASTO HOY</label><input type="number" id="p-hoy" class="w-full p-4 rounded-2xl bg-white/50 font-black text-xl"></div>
+                <button onclick="savePatch()" class="w-full bg-red-600 text-white py-5 rounded-2xl font-black">SOBRESCRIBIR TODO</button>
             </div>
         </div>
     </main>
 
-    <nav class="fixed bottom-0 left-0 right-0 bg-white/90 backdrop-blur-md border-t flex justify-around p-4 z-50">
-        <button onclick="showView('home')" class="flex flex-col items-center gap-1 text-gray-400 hover:text-gray-800">
-            <i class="fa-solid fa-house-user text-xl"></i><span class="text-[9px] font-black uppercase">Inicio</span>
+    <nav class="fixed bottom-0 left-0 right-0 bg-white/80 backdrop-blur-md border-t flex justify-around p-4 z-50">
+        <button onclick="showView('home')" class="flex flex-col items-center text-gray-400 hover:text-gray-900">
+            <i class="fa-solid fa-wallet text-xl"></i><span class="text-[8px] font-black mt-1">INICIO</span>
         </button>
-        <button onclick="showView('calc')" class="flex flex-col items-center gap-1 text-gray-400 hover:text-gray-800">
-            <i class="fa-solid fa-calculator text-xl"></i><span class="text-[9px] font-black uppercase">Calc</span>
+        <button onclick="showView('calc')" class="flex flex-col items-center text-gray-400 hover:text-gray-900">
+            <i class="fa-solid fa-calculator text-xl"></i><span class="text-[8px] font-black mt-1">CALC</span>
         </button>
-        <button onclick="showView('hist')" class="flex flex-col items-center gap-1 text-gray-400 hover:text-gray-800">
-            <i class="fa-solid fa-receipt text-xl"></i><span class="text-[9px] font-black uppercase">Historial</span>
+        <button onclick="showView('hist')" class="flex flex-col items-center text-gray-400 hover:text-gray-900">
+            <i class="fa-solid fa-clock-rotate-left text-xl"></i><span class="text-[8px] font-black mt-1">LOGS</span>
         </button>
-        <button onclick="showView('patch')" class="flex flex-col items-center gap-1 text-gray-400 hover:text-gray-800">
-            <i class="fa-solid fa-wrench text-xl"></i><span class="text-[9px] font-black uppercase">Parche</span>
+        <button onclick="showView('patch')" class="flex flex-col items-center text-gray-400 hover:text-gray-900">
+            <i class="fa-solid fa-gears text-xl"></i><span class="text-[8px] font-black mt-1">PATCH</span>
         </button>
     </nav>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getFirestore, doc, onSnapshot, updateDoc, increment, setDoc, collection, addDoc, query, orderBy, limit, deleteDoc, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { getFirestore, doc, onSnapshot, updateDoc, increment, addDoc, collection, query, orderBy, limit } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyBrpGejWy2Xstf_KiqkNSlfknl3HaBhyyE",
@@ -193,21 +174,19 @@
         let currentUser = 'roger';
         let userData = {};
 
-        // RELOJ
+        // RELOJ DIGITAL
         setInterval(() => {
             const n = new Date();
-            document.getElementById('h-hour').style.transform = `translateX(-50%) rotate(${n.getHours()*30 + n.getMinutes()*0.5}deg)`;
-            document.getElementById('h-min').style.transform = `translateX(-50%) rotate(${n.getMinutes()*6}deg)`;
-            document.getElementById('h-sec').style.transform = `translateX(-50%) rotate(${n.getSeconds()*6}deg)`;
-            document.getElementById('txt-fecha').innerText = n.toLocaleDateString('es-GT', { weekday:'long', day:'numeric', month:'short' });
+            document.getElementById('clock').innerText = n.toLocaleTimeString('en-GB');
+            document.getElementById('date').innerText = n.toLocaleDateString('es-GT', { weekday:'long', day:'numeric', month:'short' });
         }, 1000);
 
-        // NAVEGACION Y USUARIO
+        // NAVEGACIÓN Y PERFIL
         window.switchUser = (u) => {
             currentUser = u;
             document.body.className = `theme-${u}`;
-            document.getElementById('txt-usuario').innerText = u.charAt(0).toUpperCase() + u.slice(1);
-            document.getElementById('btn-bus-r').style.display = (u === 'marian') ? 'none' : 'flex';
+            document.getElementById('txt-usuario').innerText = `Perfil: ${u.toUpperCase()}`;
+            document.getElementById('btn-bus-roger').style.display = (u === 'marian') ? 'none' : 'flex';
             renderUI();
         };
 
@@ -241,7 +220,7 @@
             fetchDeudas();
         }
 
-        // ACCIONES
+        // ACCIONES RÁPIDAS
         window.quickAdd = async (monto, desc) => {
             await updateDoc(doc(db, "usuario", currentUser), { semanal: increment(-monto), gastosHoy: increment(monto) });
             await addDoc(collection(db, "movimientos"), {
@@ -268,12 +247,13 @@
             document.getElementById('in-monto').value = "";
         };
 
+        // DEUDAS
         window.addDeuda = async () => {
-            const n = document.getElementById('d-nombre').value;
-            const m = parseFloat(document.getElementById('d-monto').value);
+            const n = document.getElementById('d-nom').value;
+            const m = parseFloat(document.getElementById('d-mon').value);
             if(!n || !m) return;
             await addDoc(collection(db, "prestamos"), { u: currentUser, nom: n, m, p: false, t: new Date().toLocaleDateString() });
-            document.getElementById('d-nombre').value = ""; document.getElementById('d-monto').value = "";
+            document.getElementById('d-nom').value = ""; document.getElementById('d-mon').value = "";
         };
 
         function fetchDeudas() {
@@ -282,10 +262,9 @@
                 s.docs.forEach(docSnap => {
                     const d = docSnap.data();
                     if(d.u === currentUser && !d.p) {
-                        l.innerHTML += `<div class="bg-orange-50 p-3 rounded-xl flex justify-between items-center border border-orange-100">
-                            <div><p class="text-xs font-bold">${d.nom}</p><p class="text-[10px] opacity-50">${d.t}</p></div>
-                            <div class="flex items-center gap-2"><span class="font-bold text-sm">Q${d.m}</span>
-                            <button onclick="payDeuda('${docSnap.id}', ${d.m})" class="bg-orange-400 text-white text-[9px] px-3 py-2 rounded-lg font-bold">PAGAR</button></div>
+                        l.innerHTML += `<div class="bg-white/50 p-3 rounded-xl flex justify-between items-center text-xs">
+                            <span><b>${d.nom}</b> - Q${d.m}</span>
+                            <button onclick="payDeuda('${docSnap.id}', ${d.m})" class="bg-gray-800 text-white px-3 py-1 rounded-lg">PAGADO</button>
                         </div>`;
                     }
                 });
@@ -293,22 +272,21 @@
         }
 
         window.payDeuda = async (id, m) => {
-            if(!confirm("¿Descontar Q"+m+" de tu semanal?")) return;
             await updateDoc(doc(db, "prestamos", id), { p: true });
             await updateDoc(doc(db, "usuario", currentUser), { semanal: increment(-m), gastosHoy: increment(m) });
-            await addDoc(collection(db, "movimientos"), { u: currentUser, tipo: 'gasto', m, nota: "Pago de deuda", c: 'SEMANAL', t: new Date().toISOString() });
         };
 
+        // HISTORIAL
         function fetchHistory() {
-            const q = query(collection(db, "movimientos"), orderBy("t", "desc"), limit(20));
+            const q = query(collection(db, "movimientos"), orderBy("t", "desc"), limit(15));
             onSnapshot(q, (s) => {
                 const l = document.getElementById('list-historial'); l.innerHTML = "";
                 s.docs.forEach(docSnap => {
                     const h = docSnap.data();
                     if(h.u !== currentUser) return;
-                    l.innerHTML += `<div class="bg-white p-4 rounded-2xl flex justify-between items-center shadow-sm border-l-4 ${h.tipo==='gasto'?'border-red-300':'border-green-300'}">
-                        <div><p class="text-xs font-black">${h.nota}</p><p class="text-[9px] opacity-40">${new Date(h.t).toLocaleString()}</p></div>
-                        <p class="font-black ${h.tipo==='gasto'?'text-red-500':'text-green-600'}">${h.tipo==='gasto'?'-':'+'} Q${h.m.toFixed(2)}</p>
+                    l.innerHTML += `<div class="bg-white/40 p-4 rounded-2xl flex justify-between items-center border border-white/50">
+                        <div><p class="text-xs font-black">${h.nota}</p><p class="text-[9px] opacity-40 uppercase">${h.c}</p></div>
+                        <p class="font-black ${h.tipo==='gasto'?'text-red-500':'text-green-600'}">${h.tipo==='gasto'?'-':'+'} Q${h.m}</p>
                     </div>`;
                 });
             });
@@ -319,30 +297,26 @@
             const a = parseFloat(document.getElementById('p-aho').value);
             const h = parseFloat(document.getElementById('p-hoy').value);
             await updateDoc(doc(db, "usuario", currentUser), { semanal: s, ahorro: a, gastosHoy: h });
-            alert("Base de Datos Sincronizada 🚀");
+            alert("Base de datos sobrescrita.");
         };
 
-        // CALCULADORA MEJORADA
-        const cB = document.getElementById('calc-btns');
-        ["C", "÷", "×", "DEL", "7", "8", "9", "-", "4", "5", "6", "+", "1", "2", "3", "=", "0", ".", " ( ", " ) "].forEach(t => {
+        // CALCULADORA
+        const cG = document.getElementById('calc-grid');
+        ["C","DEL","%","/","7","8","9","*","4","5","6","-","1","2","3","+","0",".","(",")","="].forEach(t => {
             const b = document.createElement('button');
             b.innerText = t;
-            b.className = "p-5 bg-gray-50 rounded-2xl font-bold text-lg active:bg-gray-200";
-            if(["="].includes(t)) b.className += " bg-blue-500 text-white";
-            if(["C", "DEL"].includes(t)) b.className += " text-red-500";
-            b.onclick = () => doCalc(t);
-            cB.appendChild(b);
+            b.className = "p-4 bg-white/50 rounded-xl font-bold text-lg active:bg-white";
+            if(t === "=") b.className = "p-4 bg-gray-800 text-white rounded-xl font-bold col-span-2";
+            b.onclick = () => {
+                const res = document.getElementById('calc-res');
+                if(t === "C") res.innerText = "0";
+                else if(t === "DEL") res.innerText = res.innerText.slice(0,-1) || "0";
+                else if(t === "=") { try { res.innerText = eval(res.innerText); } catch { res.innerText = "Error"; } }
+                else { res.innerText = res.innerText === "0" ? t : res.innerText + t; }
+            };
+            cG.appendChild(b);
         });
 
-        let curExp = "";
-        function doCalc(t) {
-            const res = document.getElementById('calc-res');
-            if(t === "C") curExp = "";
-            else if(t === "DEL") curExp = curExp.slice(0, -1);
-            else if(t === "=") { try { curExp = eval(curExp.replace('×','*').replace('÷','/')).toString(); } catch { curExp = "Error"; } }
-            else curExp += t;
-            res.innerText = curExp || "0";
-        }
     </script>
 </body>
 </html>
