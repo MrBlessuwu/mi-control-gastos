@@ -94,6 +94,164 @@ details summary::-webkit-details-marker {
     padding: 18px;
     font-weight: bold;
 }
+    /* =========================
+ALERTA GATITO
+========================= */
+
+.z-calico-floof-container-999 {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.k-patched-cat-wrapper-777 {
+    position: relative;
+    width: 100px;
+    height: 110px;
+    margin-bottom: 20px;
+    animation: k-gentle-float-555 1.2s infinite ease-in-out;
+}
+
+.k-patched-cat-wrapper-777::before,
+.k-patched-cat-wrapper-777::after {
+    content: '';
+    position: absolute;
+    top: 0px;
+    width: 30px;
+    height: 45px;
+    background: #edb879;
+    border-radius: 50% 50% 0 0;
+    z-index: 1;
+}
+
+.k-patched-cat-wrapper-777::before {
+    left: 15px;
+    transform: rotate(-10deg);
+}
+
+.k-patched-cat-wrapper-777::after {
+    right: 15px;
+    transform: rotate(10deg);
+}
+
+.k-face-base-888 {
+    position: absolute;
+    width: 100%;
+    height: 70px;
+    background: white;
+    border-radius: 35px;
+    bottom: 5px;
+    z-index: 2;
+    overflow: hidden;
+}
+
+.k-face-base-888::before,
+.k-face-base-888::after {
+    content: '';
+    position: absolute;
+    background: #edb879;
+    border-radius: 50%;
+}
+
+.k-face-base-888::before {
+    width: 60px;
+    height: 60px;
+    top: -15px;
+    right: -15px;
+    opacity: .9;
+}
+
+.k-face-base-888::after {
+    width: 25px;
+    height: 25px;
+    top: 5px;
+    left: 10px;
+}
+
+.k-eye-dot-111 {
+    position: absolute;
+    top: 28px;
+    width: 10px;
+    height: 10px;
+    background: #333;
+    border-radius: 50%;
+    animation: k-blink-000 3s infinite;
+    z-index: 3;
+}
+
+.k-eye-left {
+    left: 25px;
+}
+
+.k-eye-right {
+    right: 25px;
+}
+
+.k-nose-tip-222 {
+    position: absolute;
+    top: 40px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 8px;
+    height: 5px;
+    background: #ffb6c1;
+    border-radius: 50%;
+    z-index: 3;
+}
+
+.q-loader-track-444 {
+    width: 180px;
+    height: 10px;
+    background: #e0e0e0;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.q-loader-fill-111 {
+    width: 0%;
+    height: 100%;
+    background: #edb879;
+    border-radius: 10px;
+    animation: q-zoom-load-333 1.2s infinite cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes k-gentle-float-555 {
+    0%,100% {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(-8px);
+    }
+}
+
+@keyframes k-blink-000 {
+    0%,90%,100% {
+        transform: scaleY(1);
+    }
+
+    95% {
+        transform: scaleY(.1);
+    }
+}
+
+@keyframes q-zoom-load-333 {
+    0% {
+        width: 0%;
+        opacity: 1;
+    }
+
+    70% {
+        width: 100%;
+        opacity: 1;
+    }
+
+    90%,100% {
+        width: 100%;
+        opacity: 0;
+    }
+}
 </style>
 </head>
 <body class="theme-roger">
@@ -435,6 +593,19 @@ let usuarioActivo = 'roger';
 let datosLocales = {};
 let movimientos = [];
 let prestamos = [];
+function mostrarMiniAlerta(texto) {
+
+    const alerta = document.getElementById('mini-alerta');
+
+    document.getElementById('mini-alerta-texto').innerText = texto;
+
+    alerta.classList.remove('hidden');
+
+    setTimeout(() => {
+        alerta.classList.add('hidden');
+    }, 1200);
+
+}
 
 // RELOJ
 setInterval(() => {
@@ -555,7 +726,7 @@ window.accionRapida = async (monto, detalle) => {
     });
 
     await registrarHistorial('gasto', monto, detalle, 'SEMANAL');
-
+mostrarMiniAlerta(`-Q${monto} en semanal`);
 };
 
 window.calcPasaje = async (multi) => {
@@ -621,7 +792,9 @@ window.guardarManual = async () => {
         nota,
         tipo.split('_')[1].toUpperCase()
     );
-
+if(tipo === 'gasto_semanal') {
+    mostrarMiniAlerta(`-Q${monto} en semanal`);
+}
 };
 
 window.acompaniarMarian = async () => {
@@ -843,5 +1016,41 @@ function renderCalcHistory() {
 }
 
 </script>
+    <!-- =========================
+ALERTA ANIMADA
+========================= -->
+
+<div id="mini-alerta" class="hidden fixed inset-0 z-[9999] flex items-center justify-center bg-black/20 backdrop-blur-sm">
+
+  <div class="glass-card px-8 py-6 flex flex-col items-center animate-pulse">
+
+    <!-- GATITO -->
+    <div class="z-calico-floof-container-999">
+
+      <div class="k-patched-cat-wrapper-777">
+
+        <div class="k-face-base-888">
+          <div class="k-eye-dot-111 k-eye-left"></div>
+          <div class="k-eye-dot-111 k-eye-right"></div>
+          <div class="k-nose-tip-222"></div>
+        </div>
+
+      </div>
+
+      <div class="q-loader-track-444">
+        <div class="q-loader-fill-111"></div>
+      </div>
+
+    </div>
+
+    <!-- TEXTO -->
+    <p id="mini-alerta-texto"
+       class="mt-4 text-sm font-black text-center">
+       Movimiento realizado
+    </p>
+
+  </div>
+
+</div>
 </body>
 </html>
