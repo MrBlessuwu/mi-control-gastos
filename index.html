@@ -574,7 +574,8 @@ import {
     addDoc,
     query,
     orderBy,
-    limit
+    limit,
+     deleteDoc
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 const firebaseConfig = {
@@ -722,9 +723,10 @@ async function registrarHistorial(tipo, monto, detalle, cuenta) {
 window.accionRapida = async (monto, detalle) => {
 
     await updateDoc(doc(db, 'usuario', usuarioActivo), {
-        semanal: increment(-monto),
-        gastosHoy: increment(monto)
-    });
+    semanal,
+    ahorro,
+    gastosHoy: 0
+});
 
     await registrarHistorial('gasto', monto, detalle, 'SEMANAL');
 mostrarMiniAlerta(`-Q${monto} en semanal`);
@@ -871,6 +873,15 @@ window.registrarPrestamo = async () => {
     }
 
 };
+    window.marcarPagado = async (id) => {
+
+    await updateDoc(doc(db, 'prestamos', id), {
+        pagado: true
+    });
+
+    mostrarMiniAlerta('Préstamo pagado');
+
+};
 
 function renderHistorial() {
 
@@ -920,9 +931,19 @@ function renderPrestamos() {
                         <p class="text-[9px] font-bold">${p.tipo === 'debemos' ? 'Debemos' : 'Nos deben'}</p>
                     </div>
 
-                    <div class="text-right">
-                        <p class="font-black text-xs">Q${p.monto}</p>
-                    </div>
+                    <div class="text-right space-y-2">
+
+    <p class="font-black text-xs">Q${p.monto}</p>
+
+    <button
+        onclick="marcarPagado('${p.id}')"
+        class="bg-green-500 text-white px-3 py-1 rounded-lg text-[9px] font-black">
+
+        ✓ PAGADO
+
+    </button>
+
+</div>
 
                 </div>
             `;
