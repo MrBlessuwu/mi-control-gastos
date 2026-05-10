@@ -722,10 +722,9 @@ async function registrarHistorial(tipo, monto, detalle, cuenta) {
 
 window.accionRapida = async (monto, detalle) => {
 
-    await updateDoc(doc(db, 'usuario', usuarioActivo), {
-    semanal,
-    ahorro,
-    gastosHoy: 0
+  await updateDoc(doc(db, 'usuario', usuarioActivo), {
+    semanal: increment(-monto),
+    gastosHoy: increment(monto)
 });
 
     await registrarHistorial('gasto', monto, detalle, 'SEMANAL');
