@@ -601,10 +601,11 @@ function mostrarMiniAlerta(texto) {
 
     alerta.classList.remove('hidden');
 
-    setTimeout(() => {
-        alerta.classList.add('hidden');
-    }, 1200);
+    clearTimeout(window.alertaTimeout);
 
+window.alertaTimeout = setTimeout(() => {
+    alerta.classList.add('hidden');
+}, 1200);
 }
 
 // RELOJ
@@ -744,6 +745,7 @@ window.calcPasaje = async (multi) => {
     });
 
     await registrarHistorial('gasto', total, 'Pasaje', 'SEMANAL');
+    mostrarMiniAlerta(`-Q${total} en pasajes`);
 
 };
 
@@ -794,6 +796,18 @@ window.guardarManual = async () => {
     );
 if(tipo === 'gasto_semanal') {
     mostrarMiniAlerta(`-Q${monto} en semanal`);
+}
+
+else if(tipo === 'ingreso_semanal') {
+    mostrarMiniAlerta(`+Q${monto} en semanal`);
+}
+
+else if(tipo === 'ingreso_ahorro') {
+    mostrarMiniAlerta(`+Q${monto} en ahorro`);
+}
+
+else if(tipo === 'gasto_ahorro') {
+    mostrarMiniAlerta(`-Q${monto} en ahorro`);
 }
 };
 
